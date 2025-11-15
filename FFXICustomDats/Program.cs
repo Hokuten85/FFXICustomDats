@@ -34,6 +34,10 @@ public class BuildDats
 {
     private readonly IConfiguration _config;
     private readonly XidbContext _context;
+    private readonly string _exportDatDir = @".\ExportDats";
+    private readonly string _generateDatDir = @".\GenerateDats";
+    private readonly string _generateYamlDir = @".\GenerateYaml";
+
     public BuildDats(IConfiguration config, XidbContext context)
     {
         _config = config;
@@ -51,7 +55,8 @@ public class BuildDats
             Console.WriteLine("Choose an option:");
             Console.WriteLine("\t1 - Parse Dats and Populate xidb tables");
             Console.WriteLine("\t2 - Read xidb tables and create Dats");
-            Console.WriteLine("\t3 - Quit");
+            Console.WriteLine("\t3 - Export Dats to Yaml");
+            Console.WriteLine("\t4 - Quit");
             Console.WriteLine();
             Console.WriteLine("Type a number, and then press Enter:");
 
@@ -66,26 +71,56 @@ public class BuildDats
                         await WriteDats();
                         break;
                     case 3:
+                        ExportDats();
+                        break;
+                    case 4:
                         endApp = true;
                         break;
                 }
+                Console.WriteLine();
             }
         }
     }
 
     private async Task ParseDats()
     {
-        await ParseItems(@"C:\XI_Tinkerer\raw_data\items\armor.yml");
-        await ParseItems(@"C:\XI_Tinkerer\raw_data\items\armor2.yml");
-        await ParseItems(@"C:\XI_Tinkerer\raw_data\items\general_items.yml");
-        await ParseItems(@"C:\XI_Tinkerer\raw_data\items\general_items2.yml");
-        Console.WriteLine();
+        await ParseItems($@"{_exportDatDir}\armor.yml");
+        await ParseItems($@"{_exportDatDir}\armor2.yml");
+        await ParseItems($@"{_exportDatDir}\general_items.yml");
+        await ParseItems($@"{_exportDatDir}\general_items2.yml");
     }
 
     private async Task WriteDats()
     {
-        await WriteNewArmor(@"C:\XI_Tinkerer\raw_data\items\new_armor.yml");
-        Console.WriteLine();
+        await WriteNewArmor($@"{_generateYamlDir}\new_armor.yml");
+    }
+
+    private void ExportDats()
+    {
+        var ffxiPath = _config.GetValue<string>("FFXIPath");
+        var outPath = $@"{_exportDatDir}\armor.yml";
+
+        Console.WriteLine("Exporting armor");
+
+        Process process = new()
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                WindowStyle = ProcessWindowStyle.Hidden,
+                WorkingDirectory = Directory.GetCurrentDirectory().ToString(),
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                FileName = @"3rdPartyTools\xi-tinkerer-cli.exe",
+                Arguments = $@"export-dat ""{ffxiPath}"" ""{outPath}""",
+                RedirectStandardOutput = true
+            }
+        };
+        process.Start();
+        process.WaitForExit();
+        Console.WriteLine(process.StandardOutput.ReadToEnd());
+
+        Console.WriteLine("Press any key to return.");
+        Console.ReadLine();
     }
 
     private async Task ParseItems(string filePath)
@@ -235,12 +270,12 @@ public class BuildDats
         await SerializeToYaml(new FFXIItems() { Items = [.. armor] });
     }
 
-    private static async Task<String> SerializeToYaml(FFXIItems ffxiItems)
+    private async Task<String> SerializeToYaml(FFXIItems ffxiItems)
     {
         var serializer = new SerializerBuilder().Build();
         var yaml = serializer.Serialize(ffxiItems);
 
-        using StreamWriter writetext = new(@"C:\XI_Tinkerer\raw_data\items\new_armor.yml");
+        using StreamWriter writetext = new($@"{_generateYamlDir}\new_armor.yml");
         await writetext.WriteAsync(yaml);
 
         return yaml;

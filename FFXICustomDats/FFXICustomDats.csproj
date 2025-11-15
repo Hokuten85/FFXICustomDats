@@ -5,8 +5,17 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UserSecretsId>b34f751f-7c34-498d-8fa7-107784c779fa</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="3rdPartyTools\xi-tinkerer-cli.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="3rdPartyTools\xi-tinkerer-cli.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
@@ -25,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.home..json">
+    <None Update="appsettings.home.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="appsettings.json">
