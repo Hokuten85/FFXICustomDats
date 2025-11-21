@@ -1,0 +1,1 @@
+dotnet ef dbcontext scaffold "data source=localhost;initial catalog=xidb;user id=root;password=Hokuten1" "Pomelo.EntityFrameworkCore.MySql" -o Data\Entities --context-dir Data -f

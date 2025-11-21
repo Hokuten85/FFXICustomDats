@@ -1,24 +1,20 @@
-﻿using FFXICustomDats.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using FFXICustomDats.Data.XidbEntities;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace FFXICustomDats.Data;
 
 public partial class XidbContext : DbContext
 {
-    private readonly IConfiguration _configuration;
-    public XidbContext(IConfiguration configuration)
+    public XidbContext()
     {
-        _configuration = configuration;
     }
 
-    public XidbContext(DbContextOptions<XidbContext> options, IConfiguration configuration)
+    public XidbContext(DbContextOptions<XidbContext> options)
         : base(options)
     {
-        _configuration = configuration;
     }
 
     public virtual DbSet<AbilitiesCharge> AbilitiesCharges { get; set; }
@@ -69,7 +65,7 @@ public partial class XidbContext : DbContext
 
     public virtual DbSet<CampaignNation> CampaignNations { get; set; }
 
-    public virtual DbSet<Entities.Char> Chars { get; set; }
+    public virtual DbSet<XidbEntities.Char> Chars { get; set; }
 
     public virtual DbSet<CharBlacklist> CharBlacklists { get; set; }
 
@@ -174,8 +170,6 @@ public partial class XidbContext : DbContext
     public virtual DbSet<IpException> IpExceptions { get; set; }
 
     public virtual DbSet<ItemBasic> ItemBasics { get; set; }
-
-    public virtual DbSet<ItemDescription> ItemDescriptions { get; set; }
 
     public virtual DbSet<ItemEquipment> ItemEquipments { get; set; }
 
@@ -1097,7 +1091,7 @@ public partial class XidbContext : DbContext
                 .HasColumnName("reconnaissance");
         });
 
-        modelBuilder.Entity<Entities.Char>(entity =>
+        modelBuilder.Entity<XidbEntities.Char>(entity =>
         {
             entity.HasKey(e => e.Charid).HasName("PRIMARY");
 
@@ -3969,57 +3963,6 @@ public partial class XidbContext : DbContext
                 .HasDefaultValueSql("@`GENERAL_TYPE`")
                 .HasColumnType("tinyint(1) unsigned")
                 .HasColumnName("type");
-        });
-
-        modelBuilder.Entity<ItemDescription>(entity =>
-        {
-            entity.HasKey(e => e.Itemid).HasName("PRIMARY");
-
-            entity.ToTable("item_description");
-
-            entity.Property(e => e.Itemid)
-                .ValueGeneratedNever()
-                .HasColumnType("smallint(5) unsigned")
-                .HasColumnName("itemid");
-            entity.Property(e => e.ArticleType)
-                .HasColumnType("tinytext")
-                .HasColumnName("article_type");
-            entity.Property(e => e.DatFile)
-                .HasColumnType("tinytext")
-                .HasColumnName("dat_file");
-            entity.Property(e => e.Description)
-                .HasColumnType("text")
-                .HasColumnName("description");
-            entity.Property(e => e.IconBytes)
-                .HasColumnType("blob")
-                .HasColumnName("icon_bytes");
-            entity.Property(e => e.ItemType)
-                .HasColumnType("tinytext")
-                .HasColumnName("item_type");
-            entity.Property(e => e.Name)
-                .HasColumnType("tinytext")
-                .HasColumnName("name");
-            entity.Property(e => e.NoTradePc)
-                .HasColumnType("bit(1)")
-                .HasColumnName("no_trade_pc");
-            entity.Property(e => e.PluralName)
-                .HasColumnType("tinytext")
-                .HasColumnName("plural_name");
-            entity.Property(e => e.ResourceId)
-                .HasColumnType("int(11)")
-                .HasColumnName("resource_id");
-            entity.Property(e => e.SingularName)
-                .HasColumnType("tinytext")
-                .HasColumnName("singular_name");
-            entity.Property(e => e.Unknown1)
-                .HasColumnType("int(11)")
-                .HasColumnName("unknown1");
-            entity.Property(e => e.Unknown2)
-                .HasColumnType("int(11)")
-                .HasColumnName("unknown2");
-            entity.Property(e => e.Unknown3)
-                .HasColumnType("int(11)")
-                .HasColumnName("unknown3");
         });
 
         modelBuilder.Entity<ItemEquipment>(entity =>
