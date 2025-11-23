@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FFXICustomDats.YamlModels.Items
 {
-    public enum SkillType { Axe = 1, Club, Dagger, Fishing, GreatAxe, GreatKatana, GreatSword, Handbell, HandToHand, Katana, Marksmanship, None, PoleArm, Ranged, Scythe, Special, Staff, StringInstrument, Sword, Thrown, WindInstrument };
+    public enum SkillType { None = 0, Axe, Club, Dagger, Fishing, GreatAxe, GreatKatana, GreatSword, Handbell, HandToHand, Katana, Marksmanship, PoleArm, Ranged, Scythe, Special, Staff, StringInstrument, Sword, Thrown, WindInstrument };
 
     public partial class SkillTypeConversion
     {

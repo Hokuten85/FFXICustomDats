@@ -8,6 +8,7 @@ namespace FFXICustomDats.YamlModels.Items
 {
     public enum Race
     { 
+        Zero = 0,
         HumeMale = 0x01,
         HumeFemale = 0x02,
         ElvaanMale = 0x04,

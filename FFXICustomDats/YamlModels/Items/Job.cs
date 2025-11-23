@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace FFXICustomDats.YamlModels.Items
 {
     public enum Job {
-        WAR = 1, MNK, WHM, BLM, RDM, THF, PLD, DRK, BST, BRD, RNG, SAM, NIN, DRG, SMN, BLU, COR, PUP, DNC, SCH, GEO, RUN,
+        Zero = 0,
+        WAR, MNK, WHM, BLM, RDM, THF, PLD, DRK, BST, BRD, RNG, SAM, NIN, DRG, SMN, BLU, COR, PUP, DNC, SCH, GEO, RUN,
         All = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 | 0x800 | 0x1000 | 0x2000 | 0x4000 | 0x8000 | 0x10000 | 0x20000 | 0x40000 | 0x80000 | 0x100000 | 0x200000
     };
 
@@ -93,13 +94,6 @@ namespace FFXICustomDats.YamlModels.Items
             }
 
             return jobList;
-        }
-
-        public static ushort ConvertYamlJobsToBit(List<Job> jobs)
-        {
-            return (ushort)jobs.Aggregate(0, (total, next) => (
-                (int)total | (next == Job.All ? (int)next : (1 << ((int)next - 1)))
-            ));
         }
     }  
 }

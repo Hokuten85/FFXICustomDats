@@ -39,5 +39,5 @@ builder.Services.AddTransient<WriteDats>();
 var host = builder.Build();
 
 var app = host.Services.GetRequiredService<CustomDats>();
-await app.MainMenu();
+app.MainMenu();
 

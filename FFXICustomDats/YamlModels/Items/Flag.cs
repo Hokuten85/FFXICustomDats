@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FFXICustomDats.YamlModels.Items
 {
-    public enum Flag { CanEquip = 1, CanSendPol, CanTradeNpc, CanUse, Ex, Flag01, Inscribable, Linkshell, MogGarden, MysteryBox, NoAuction, NoDelivery, NoSale, NoTradePC, Rare, Scroll, WallHanging };
+    public enum Flag { Zero = 0, CanEquip, CanSendPol, CanTradeNpc, CanUse, Ex, Flag01, Inscribable, Linkshell, MogGarden, MysteryBox, NoAuction, NoDelivery, NoSale, NoTradePC, Rare, Scroll, WallHanging };
 
     public class FlagConversion
     {
@@ -70,30 +71,25 @@ namespace FFXICustomDats.YamlModels.Items
             { Flag.Rare       , ITEM_FLAG.ITEM_FLAG_RARE },
         };
 
-        public static List<Flag> ConvertBitFlagsToYaml(ushort flags, bool noTradePC)
-        {
-            var flagList = new List<Flag>();
-            foreach (var itemFlag in FlagDict.Keys)
-            {
-                if ((flags & (ushort)itemFlag) > 0)
-                {
-                    if (itemFlag == ITEM_FLAG.ITEM_FLAG_EX && noTradePC)
-                    {
-                        flagList.Add(Flag.NoTradePC);
-                    }
-                    else if (FlagDict.TryGetValue(itemFlag, out Flag flag))
-                    {
-                        flagList.Add(flag);
-                    }
-                }
-            }
-            return flagList;
-        }
-
-        public static ushort ConvertYamlFlagsToBit(List<Flag> flags)
-        {
-            return (ushort)flags.Cast<int>().Aggregate(0, (total, next) => (total | (1 << (next - 1))));
-        }
+        //public static List<Flag> ConvertBitFlagsToYaml(ushort flags, bool noTradePC)
+        //{
+        //    var flagList = new List<Flag>();
+        //    foreach (var itemFlag in FlagDict.Keys)
+        //    {
+        //        if ((flags & (ushort)itemFlag) > 0)
+        //        {
+        //            if (itemFlag == ITEM_FLAG.ITEM_FLAG_EX && noTradePC)
+        //            {
+        //                flagList.Add(Flag.NoTradePC);
+        //            }
+        //            else if (FlagDict.TryGetValue(itemFlag, out Flag flag))
+        //            {
+        //                flagList.Add(flag);
+        //            }
+        //        }
+        //    }
+        //    return flagList;
+        //}
     }
 }
 

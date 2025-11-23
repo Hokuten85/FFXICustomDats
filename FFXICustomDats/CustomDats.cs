@@ -21,7 +21,7 @@ namespace FFXICustomDats
         private readonly ExportDats _exportDats = exportDats;
         private readonly WriteDats _writeDats = writeDats;
 
-        public async Task MainMenu()
+        public void MainMenu()
         {
             bool endApp = false;
 
@@ -45,7 +45,7 @@ namespace FFXICustomDats
                             _parseYaml.ParseYamlFiles();
                             break;
                         case 2:
-                            await _writeDats.WriteYamlToDats();
+                            _writeDats.WriteYamlToDats();
                             break;
                         case 3:
                             _exportDats.ExportDatToYaml();

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FFXICustomDats.YamlModels.Items
 {
-    public enum Element { Undecided = 1, Dark, Water, Air, Light, Ice, Thunder, Fire, Earth };
+    public enum Element { Zero = 0, Undecided, Dark, Water, Air, Light, Ice, Thunder, Fire, Earth };
 
     public partial class ElementConversion
     {

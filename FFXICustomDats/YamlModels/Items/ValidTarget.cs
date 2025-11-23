@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FFXICustomDats.YamlModels.Items
 {
-    public enum ValidTarget { Corpse = 1, Enemy, Object, PartyMember, SelfTarget, Ally, NPC };
+    public enum ValidTarget { Zero = 0, Corpse, Enemy, Object, PartyMember, SelfTarget, Ally, NPC };
 
     public partial class ValidTargetConversion
     {
@@ -46,30 +46,25 @@ namespace FFXICustomDats.YamlModels.Items
             //{ TARGETTYPE.TARGET_ANY_ALLEGIANCE, ValidTarget.NoSale },
         };
 
-        public static List<ValidTarget> ConvertBitValidTargetsToYaml(ushort validTargets, bool vaidTargetObject)
-        {
-            var validTargetList = new List<ValidTarget>();
-            foreach (var target in ValidTargetDict.Keys)
-            {
-                if ((validTargets & (ushort)target) > 0)
-                {
-                    if (target == TARGETTYPE.TARGET_NPC && vaidTargetObject)
-                    {
-                        validTargetList.Add(ValidTarget.Object);
-                    }
-                    else if (ValidTargetDict.TryGetValue(target, out ValidTarget validTarget))
-                    {
-                        validTargetList.Add(validTarget);
-                    }
-                }
-            }
+        //public static List<ValidTarget> ConvertBitValidTargetsToYaml(ushort validTargets, bool vaidTargetObject)
+        //{
+        //    var validTargetList = new List<ValidTarget>();
+        //    foreach (var target in ValidTargetDict.Keys)
+        //    {
+        //        if ((validTargets & (ushort)target) > 0)
+        //        {
+        //            if (target == TARGETTYPE.TARGET_NPC && vaidTargetObject)
+        //            {
+        //                validTargetList.Add(ValidTarget.Object);
+        //            }
+        //            else if (ValidTargetDict.TryGetValue(target, out ValidTarget validTarget))
+        //            {
+        //                validTargetList.Add(validTarget);
+        //            }
+        //        }
+        //    }
 
-            return validTargetList;
-        }
-
-        public static ushort ConvertYamlValidTargetsToBit(List<ValidTarget> validTargets)
-        {
-            return (ushort)validTargets.Cast<int>().Aggregate(0, (total, next) => (total | (1 << (next - 1))));
-        }
+        //    return validTargetList;
+        //}
     }  
 }

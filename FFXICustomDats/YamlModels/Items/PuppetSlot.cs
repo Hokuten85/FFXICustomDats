@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FFXICustomDats.YamlModels.Items
 {
-    public enum PuppetSlot { Body = 1, Head, None, Attachment };
+    public enum PuppetSlot { None = 0, Body, Head, Attachment };
 
     public partial class PuppetSlotConversion
     {

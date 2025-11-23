@@ -69,10 +69,5 @@ namespace FFXICustomDats.YamlModels.Items
             }
             return slotsList;
         }
-
-        public static ushort ConvertYamlSlotsToBit(List<Slot> slots)
-        {
-            return (ushort)slots.Cast<int>().Aggregate(0, (total, next) => (total | (1 << (next - 1))));
-        }
     }  
 }

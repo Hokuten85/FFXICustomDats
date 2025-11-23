@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FFXICustomDats.YamlModels.Items
 {
-    public enum ItemType { Armor = 1, BettingSlip, Book, Flowerpot, Furnishing, Item, Linkshell, LotteryTicket, Mannequin, Plant, QuestItem, RacingForm, Reflector, SoulPlate, UsableItem, None, Weapon, Crystal, Fish };
+    public enum ItemType { None = 0, Armor, BettingSlip, Book, Flowerpot, Furnishing, Item, Linkshell, LotteryTicket, Mannequin, Plant, QuestItem, RacingForm, Reflector, SoulPlate, UsableItem, Weapon, Crystal, Fish };
 
     public partial class ItemTypeConversion
     {

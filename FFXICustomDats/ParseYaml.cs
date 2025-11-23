@@ -112,11 +112,11 @@ namespace FFXICustomDats
             var newItem = new DatEntities.Item()
             {
                 ItemId = item.Id,
-                Flags = FlagConversion.ConvertYamlFlagsToBit(item.Flags),
+                Flags = Helpers.ConvertEnumListToBit(item.Flags),
                 StackSize = item.StackSize,
                 ItemType = (ushort)item.ItemType,
                 ResourceId = item.ResourceId,
-                ValidTargets = ValidTargetConversion.ConvertYamlValidTargetsToBit(item.ValidTargets),
+                ValidTargets = Helpers.ConvertEnumListToBit(item.ValidTargets),
                 IconBytes = Encoding.ASCII.GetBytes(item.IconBytes),
                 DatFile = fileName,
             };
@@ -161,9 +161,9 @@ namespace FFXICustomDats
             {
                 ItemId = item.Id,
                 Level = (byte)item.Equipment.Level,
-                Slot = SlotConversion.ConvertYamlSlotsToBit(item.Equipment.Slots),
-                Races = RaceConversion.ConvertYamlRaceToBit(item.Equipment.Races),
-                Jobs = JobConversion.ConvertYamlJobsToBit(item.Equipment.Jobs),
+                Slot = Helpers.ConvertEnumListToBit(item.Equipment.Slots),
+                Races = Helpers.ConvertEnumListToBit(item.Equipment.Races),
+                Jobs = Helpers.ConvertEnumListToBit(item.Equipment.Jobs),
                 SuperiorLevel = item.Equipment.SuperiorLevel,
                 ShieldSize = item.Equipment.ShieldSize,
                 MaxCharges = item.Equipment.MaxCharges,
@@ -281,7 +281,7 @@ namespace FFXICustomDats
             }
         }
 
-        public static class ObjectComparerUtility
+        private static class ObjectComparerUtility
         {
             public static bool ObjectsAreEqual<T>(T obj1, T obj2, bool makeEqual = false)
             {

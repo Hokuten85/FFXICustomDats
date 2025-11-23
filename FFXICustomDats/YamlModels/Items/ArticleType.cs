@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FFXICustomDats.YamlModels.Items
 {
-    public enum ArticleType { A = 1, An, PairOf, SuitsOf };
+    public enum ArticleType { Zero = 0, A, An, PairOf, SuitsOf };
 
     public partial class ArticleTypeConversion
     {
