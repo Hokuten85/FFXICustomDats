@@ -8,7 +8,7 @@ using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 
-namespace FFXICustomDats.YamlModels.Items
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public partial class Weapon
     {

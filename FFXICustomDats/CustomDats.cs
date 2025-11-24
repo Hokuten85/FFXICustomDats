@@ -30,8 +30,8 @@ namespace FFXICustomDats
                 Console.Clear();
                 Console.WriteLine("FFXI Dat Generator");
                 Console.WriteLine("Choose an option:");
-                Console.WriteLine("\t1 - Parse Dats and Populate xidb tables");
-                Console.WriteLine("\t2 - Read xidb tables and create Dats");
+                Console.WriteLine("\t1 - Parse Dats and Populate xidatdb tables");
+                Console.WriteLine("\t2 - Read xidatdb tables and create Dats");
                 Console.WriteLine("\t3 - Export Dats to Yaml");
                 Console.WriteLine("\t4 - Quit");
                 Console.WriteLine();

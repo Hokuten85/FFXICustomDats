@@ -1,6 +1,8 @@
 ﻿using FFXICustomDats.Data;
 using FFXICustomDats.Data.XiDatEntities;
 using FFXICustomDats.YamlModels.Items;
+using FFXICustomDats.YamlModels.Items.ItemAttributes;
+using FFXICustomDats.YamlModels.Items.ItemTypes;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,9 @@ namespace FFXICustomDats
             GetDBItemsAndWriteYaml<ArmorItem>("armor2.yml");
             GetDBItemsAndWriteYaml<FurnishingItem>("general_items.yml");
             GetDBItemsAndWriteYaml<FurnishingItem>("general_items2.yml");
+            GetDBItemsAndWriteYaml<PuppetItem>("puppet_items.yml");
+            GetDBItemsAndWriteYaml<UsableItem>("usable_items.yml");
+            GetDBItemsAndWriteYaml<WeaponItem>("weapons.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
@@ -39,13 +44,19 @@ namespace FFXICustomDats
             var exportDatDir = _config.GetValue<string>("ExportDatDir");
 
             string itemYaml = string.Empty;
-            if (typeof(T) == typeof(ArmorItem))
+
+            var typeToFunc = new Dictionary<Type, Func<string, string>>
             {
-                itemYaml = SerializeToYaml(GetArmorItems(fileName));
-            }
-            else if (typeof(T) == typeof(FurnishingItem))
+                { typeof(ArmorItem), GetArmorItems },
+                { typeof(FurnishingItem), GetGeneralItems },
+                { typeof(PuppetItem), GetPuppetItems },
+                { typeof(UsableItem), GetUsableItems },
+                { typeof(WeaponItem), GetWeaponItems },
+            };
+
+            if (typeToFunc.TryGetValue(typeof(T), out var func))
             {
-                itemYaml = SerializeToYaml(GetGeneralItems(fileName));
+                itemYaml = func(fileName);
             }
 
             if (!string.IsNullOrWhiteSpace(itemYaml))
@@ -54,7 +65,7 @@ namespace FFXICustomDats
             }
         }
 
-        private FFXIItems<ArmorItem> GetArmorItems(string fileName)
+        private string GetArmorItems(string fileName)
         {
             Console.WriteLine($"Fetching info for {fileName}");
 
@@ -65,46 +76,13 @@ namespace FFXICustomDats
                                 on item.ItemId equals strings.ItemId
                             select new { item, equipment, strings }).ToList();
 
-            return new FFXIItems<ArmorItem>()
+            return SerializeToYaml(new FFXIItems<ArmorItem>()
             {
-                Items = [.. armorList.Select(x => new ArmorItem() {
-                    Id = x.item.ItemId,
-                    Strings = new Strings()
-                    {
-                        Name = x.strings.Name,
-                        ArticleType = (ArticleType)x.strings.ArticleType,
-                        SingularName = x.strings.SingularName,
-                        PluralName = x.strings.PluralName,
-                        Description = x.strings.Description,
-                    },
-                    Flags = Helpers.BitsToEnumList<Flag>(x.item.Flags),
-                    StackSize = x.item.StackSize,
-                    ItemType = (ItemType)x.item.ItemType,
-                    ResourceId = x.item.ResourceId,
-                    ValidTargets = Helpers.BitsToEnumList<ValidTarget>(x.item.ValidTargets),
-                    Equipment = new Equipment()
-                    {
-                        Level = x.equipment.Level,
-                        Slots = Helpers.BitsToEnumList<Slot>(x.equipment.Slot),
-                        Races = [(Race)x.equipment.Races],
-                        Jobs = Helpers.JobBitsToEnumList(x.equipment.Jobs),
-                        SuperiorLevel = x.equipment.SuperiorLevel,
-                        ShieldSize = x.equipment.ShieldSize,
-                        MaxCharges = x.equipment.MaxCharges,
-                        CastingTime = x.equipment.CastingTime,
-                        UseDelay = x.equipment.UseDelay,
-                        ReuseDelay = x.equipment.ReuseDelay,
-                        Unknown1 = x.equipment.Unknown1,
-                        Ilevel = x.equipment.ILevel,
-                        Unknown2 = x.equipment.Unknown2,
-                        Unknown3 = x.equipment.Unknown3,
-                    },
-                    IconBytes = Encoding.ASCII.GetString(x.item.IconBytes),
-                })]
-            };
+                Items = [.. armorList.Select(x => new ArmorItem(x.item, x.strings, x.equipment))]
+            });
         }
 
-        private FFXIItems<FurnishingItem> GetGeneralItems(string fileName)
+        private string GetGeneralItems(string fileName)
         {
             Console.WriteLine($"Fetching info for {fileName}");
 
@@ -115,32 +93,63 @@ namespace FFXICustomDats
                                 on item.ItemId equals furnishing.ItemId
                              select new { item, furnishing, strings }).ToList();
 
-            return new FFXIItems<FurnishingItem>()
+            return SerializeToYaml(new FFXIItems<FurnishingItem>()
             {
-                Items = [.. itemList.Select(x => new FurnishingItem() {
-                    Id = x.item.ItemId,
-                    Strings = new Strings()
-                    {
-                        Name = x.strings.Name,
-                        ArticleType = (ArticleType)x.strings.ArticleType,
-                        SingularName = x.strings.SingularName,
-                        PluralName = x.strings.PluralName,
-                        Description = x.strings.Description,
-                    },
-                    Flags = Helpers.BitsToEnumList<Flag>(x.item.Flags),
-                    StackSize = x.item.StackSize,
-                    ItemType = (ItemType)x.item.ItemType,
-                    ResourceId = x.item.ResourceId,
-                    ValidTargets = Helpers.BitsToEnumList<ValidTarget>(x.item.ValidTargets),
-                    Furnishing = new Furnishing() 
-                    {
-                        Element = (Element)x.furnishing.Element,
-                        StorageSlots = x.furnishing.StorageSlots,
-                        Unknown3 = x.furnishing.Unknown3
-                    },
-                    IconBytes = Encoding.ASCII.GetString(x.item.IconBytes),
-                })]
-            };
+                Items = [.. itemList.Select(x => new FurnishingItem(x.item, x.strings, x.furnishing))]
+            });
+        }
+
+        private string GetPuppetItems(string fileName)
+        {
+            Console.WriteLine($"Fetching info for {fileName}");
+
+            var itemList = (from item in _datContext.Items.Where(x => x.DatFile == fileName)
+                            join strings in _datContext.ItemStrings
+                                on item.ItemId equals strings.ItemId
+                            join puppet in _datContext.ItemPuppets
+                                on item.ItemId equals puppet.ItemId
+                            select new { item, puppet, strings }).ToList();
+
+            return SerializeToYaml(new FFXIItems<PuppetItem>()
+            {
+                Items = [.. itemList.Select(x => new PuppetItem(x.item, x.strings, x.puppet))]
+            });
+        }
+
+        private string GetUsableItems(string fileName)
+        {
+            Console.WriteLine($"Fetching info for {fileName}");
+
+            var itemList = (from item in _datContext.Items.Where(x => x.DatFile == fileName)
+                            join strings in _datContext.ItemStrings
+                                on item.ItemId equals strings.ItemId
+                            join usable in _datContext.ItemUsables
+                                on item.ItemId equals usable.ItemId
+                            select new { item, usable, strings }).ToList();
+
+            return SerializeToYaml(new FFXIItems<UsableItem>()
+            {
+                Items = [.. itemList.Select(x => new UsableItem(x.item, x.strings, x.usable))]
+            });
+        }
+
+        private string GetWeaponItems(string fileName)
+        {
+            Console.WriteLine($"Fetching info for {fileName}");
+
+            var itemList = (from item in _datContext.Items.Where(x => x.DatFile == fileName)
+                            join strings in _datContext.ItemStrings
+                                on item.ItemId equals strings.ItemId
+                            join equipment in _datContext.ItemEquipments
+                                on item.ItemId equals equipment.ItemId
+                            join weapon in _datContext.ItemWeapons
+                                on item.ItemId equals weapon.ItemId
+                            select new { item, equipment, weapon, strings }).ToList();
+
+            return SerializeToYaml(new FFXIItems<WeaponItem>()
+            {
+                Items = [.. itemList.Select(x => new WeaponItem(x.item, x.strings, x.equipment, x.weapon))]
+            });
         }
 
         private static String SerializeToYaml<T>(FFXIItems<T> ffxiItems) where T : YamlItems.Item

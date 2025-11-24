@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
-namespace FFXICustomDats.YamlModels.Items
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public partial class Strings
     {

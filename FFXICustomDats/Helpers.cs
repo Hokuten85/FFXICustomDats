@@ -1,4 +1,4 @@
-﻿using FFXICustomDats.YamlModels.Items;
+﻿using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

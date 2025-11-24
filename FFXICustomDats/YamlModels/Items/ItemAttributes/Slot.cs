@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FFXICustomDats.YamlModels.Items
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public enum Slot { None = 0, Back, Body, Ears, Feet, Hands, Head, Legs, Neck, Rings, Sub, Waist, Ammo, Range, Main, Attachment };
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FFXICustomDats.YamlModels.Items
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public enum SkillType { None = 0, Axe, Club, Dagger, Fishing, GreatAxe, GreatKatana, GreatSword, Handbell, HandToHand, Katana, Marksmanship, PoleArm, Ranged, Scythe, Special, Staff, StringInstrument, Sword, Thrown, WindInstrument };
 

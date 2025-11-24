@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Microsoft.Extensions.Configuration;
+using FFXICustomDats.YamlModels.Items.ItemTypes;
 
 namespace FFXICustomDats
 {
@@ -20,13 +21,13 @@ namespace FFXICustomDats
 
         public void ParseYamlFiles()
         {
-            UpdateXiDatdbFromYaml<YamlItems.ArmorItem>("armor.yml");
-            UpdateXiDatdbFromYaml<YamlItems.ArmorItem>("armor2.yml");
-            UpdateXiDatdbFromYaml<YamlItems.FurnishingItem>("general_items.yml");
-            UpdateXiDatdbFromYaml<YamlItems.FurnishingItem>("general_items2.yml");
-            UpdateXiDatdbFromYaml<YamlItems.PuppetItem>("puppet_items.yml");
-            UpdateXiDatdbFromYaml<YamlItems.UsableItem>("usable_items.yml");
-            UpdateXiDatdbFromYaml<YamlItems.WeaponItem>("weapons.yml");
+            UpdateXiDatdbFromYaml<ArmorItem>("armor.yml");
+            UpdateXiDatdbFromYaml<ArmorItem>("armor2.yml");
+            UpdateXiDatdbFromYaml<FurnishingItem>("general_items.yml");
+            UpdateXiDatdbFromYaml<FurnishingItem>("general_items2.yml");
+            UpdateXiDatdbFromYaml<PuppetItem>("puppet_items.yml");
+            UpdateXiDatdbFromYaml<UsableItem>("usable_items.yml");
+            UpdateXiDatdbFromYaml<WeaponItem>("weapons.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
