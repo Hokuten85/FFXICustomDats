@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public enum Job {
         Zero = 0,
@@ -12,9 +6,9 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
         All = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 | 0x800 | 0x1000 | 0x2000 | 0x4000 | 0x8000 | 0x10000 | 0x20000 | 0x40000 | 0x80000 | 0x100000 | 0x200000
     };
 
-    public partial class JobConversion
+    public static class JobHelpers
     {
-        private enum JOBTYPE
+        public enum JOBTYPE
         {
             JOB_NON = 0x000000,
             JOB_WAR = 0x000001,
@@ -43,7 +37,7 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
             JOB_ALL = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 | 0x800 | 0x1000 | 0x2000 | 0x4000 | 0x8000 | 0x10000 | 0x20000 | 0x40000 | 0x80000 | 0x100000 | 0x200000
         };
 
-        private readonly static Dictionary<JOBTYPE, Job> JobDict = new()
+        public readonly static Dictionary<JOBTYPE, Job> JobMap = new()
         {
             //{ JOBTYPE.JOB_NON, Job.HumeMale },                      
             { JOBTYPE.JOB_WAR, Job.WAR },
@@ -72,28 +66,36 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
             { JOBTYPE.JOB_ALL, Job.All },
         };
 
-        public static List<Job> ConvertBitJobsToYaml(uint jobs)
+        public static bool IsEqual(List<Job> jobList, uint dbJobs)
         {
-            var jobList = new List<Job>();
-            if (jobs == (uint)JOBTYPE.JOB_ALL)
+            var dbList = DBFlagsToYamlFlags(dbJobs);
+            return Helpers.AreEqual(jobList, dbList);
+        }
+
+        public static List<JOBTYPE> JobTypeBitsToEnumList(uint bits)
+        {
+            var enumList = new List<JOBTYPE>();
+            if (bits == (uint)JOBTYPE.JOB_ALL)
             {
-                jobList.Add(Job.All);
+                enumList.Add(JOBTYPE.JOB_ALL);
             }
             else
             {
-                foreach (var jobType in JobDict.Keys.SkipLast(1))
+                foreach (var value in Enum.GetValues<JOBTYPE>().Where(x => !x.Equals(JOBTYPE.JOB_ALL)))
                 {
-                    if ((jobs & (uint)jobType) > 0)
+                    if ((bits & 1 << (int)value - 1) > 0)
                     {
-                        if (JobDict.TryGetValue(jobType, out Job job))
-                        {
-                            jobList.Add(job);
-                        }
+                        enumList.Add(value);
                     }
                 }
             }
 
-            return jobList;
+            return enumList;
         }
-    }  
+
+        public static List<Job> DBFlagsToYamlFlags(uint dbValue)
+        {
+            return [.. JobTypeBitsToEnumList(dbValue).Select(x => JobMap.TryGetValue(x, out var value) ? value : Job.Zero).Distinct()];
+        }
+    }
 }

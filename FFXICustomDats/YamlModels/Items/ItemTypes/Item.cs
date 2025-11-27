@@ -1,38 +1,11 @@
-﻿using FFXICustomDats.Data.XiDatEntities;
-using FFXICustomDats.YamlModels.Items.ItemAttributes;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Core;
-using YamlDotNet.Core.Events;
+﻿using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using YamlDotNet.Serialization;
 
-namespace FFXICustomDats.YamlModels.Items
+namespace FFXICustomDats.YamlModels.Items.ItemTypes
 {
     public partial class Item
     {
         public Item() { }
-        public Item(FFXICustomDats.Data.XiDatEntities.Item item, ItemString strings)
-        {
-            Id = item.ItemId;
-            Strings = new Strings()
-            {
-                Name = strings.Name,
-                ArticleType = (ArticleType)strings.ArticleType,
-                SingularName = strings.SingularName,
-                PluralName = strings.PluralName,
-                Description = strings.Description,
-            };
-            Flags = Helpers.BitsToEnumList<Flag>(item.Flags);
-            StackSize = item.StackSize;
-            ItemType = (ItemType)item.ItemType;
-            ResourceId = item.ResourceId;
-            ValidTargets = Helpers.BitsToEnumList<ValidTarget>(item.ValidTargets);
-            IconBytes = Encoding.ASCII.GetString(item.IconBytes);
-        }
 
         [YamlMember(Alias = "id", ApplyNamingConventions = false, Order = 1)]
         public ushort Id { get; set; }

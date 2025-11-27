@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
+﻿using YamlDotNet.Serialization;
 
-namespace FFXICustomDats.YamlModels.Items
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public partial class ElementCharge
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public enum Element { Zero = 0, Undecided, Dark, Water, Air, Light, Ice, Thunder, Fire, Earth };
 

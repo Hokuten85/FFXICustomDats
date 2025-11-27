@@ -1,25 +1,9 @@
-﻿using FFXICustomDats.Data;
-using FFXICustomDats.YamlModels.Items;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
-using DatEntities = FFXICustomDats.Data.XiDatEntities;
-using YamlItems = FFXICustomDats.YamlModels.Items;
-
-namespace FFXICustomDats
+﻿namespace FFXICustomDats
 {
-    public class CustomDats(IConfiguration config, ParseYaml parseYaml, ExportDats exportDats, WriteDats writeDats)
+    public class CustomDats(PatchYaml patchYaml, ExportDats exportDats)
     {
-        private readonly IConfiguration _config = config;
-        private readonly ParseYaml _parseYaml = parseYaml;
+        private readonly PatchYaml _patchYaml = patchYaml;
         private readonly ExportDats _exportDats = exportDats;
-        private readonly WriteDats _writeDats = writeDats;
 
         public void MainMenu()
         {
@@ -30,10 +14,12 @@ namespace FFXICustomDats
                 Console.Clear();
                 Console.WriteLine("FFXI Dat Generator");
                 Console.WriteLine("Choose an option:");
-                Console.WriteLine("\t1 - Parse Dats and Populate xidatdb tables");
-                Console.WriteLine("\t2 - Read xidatdb tables and create Dats");
-                Console.WriteLine("\t3 - Export Dats to Yaml");
-                Console.WriteLine("\t4 - Quit");
+                Console.WriteLine("\t1 - Export Dats to Yaml");
+                Console.WriteLine("\t2 - Apply xidb data to Yaml");
+                Console.WriteLine("\t3 - Apply patch file to Yaml");
+                Console.WriteLine("\t4 - Create Dats");
+                Console.WriteLine("\t5 - Clear GenerateYaml directory");
+                Console.WriteLine("\t6 - Quit");
                 Console.WriteLine();
                 Console.WriteLine("Type a number, and then press Enter:");
 
@@ -42,15 +28,21 @@ namespace FFXICustomDats
                     switch (numInput)
                     {
                         case 1:
-                            _parseYaml.ParseYamlFiles();
+                            _exportDats.ExportDatToYaml(); 
                             break;
                         case 2:
-                            _writeDats.WriteYamlToDats();
+                            _patchYaml.PatchYamlFromXidb();
                             break;
                         case 3:
-                            _exportDats.ExportDatToYaml();
+                            _patchYaml.PatchYamlFromFiles();
                             break;
                         case 4:
+                            //_writeDats.WriteNewYaml();
+                            break;
+                        case 5:
+                            _patchYaml.ClearGenerateYamlDir();
+                            break;
+                        case 6:
                             endApp = true;
                             break;
                     }

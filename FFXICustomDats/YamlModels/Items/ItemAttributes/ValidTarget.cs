@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public enum ValidTarget { Zero = 0, Corpse, Enemy, Object, PartyMember, SelfTarget, Ally, NPC };
 

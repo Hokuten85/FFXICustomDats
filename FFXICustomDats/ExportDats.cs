@@ -1,16 +1,6 @@
-﻿using FFXICustomDats.Data;
-using FFXICustomDats.YamlModels.Items;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
-using DatEntities = FFXICustomDats.Data.XiDatEntities;
-using YamlItems = FFXICustomDats.YamlModels.Items;
+
 
 namespace FFXICustomDats
 {
