@@ -14,6 +14,7 @@ builder.Services.AddDbContext<XidbContext>(options =>
 builder.Services.AddTransient<CustomDats>();
 builder.Services.AddTransient<PatchYaml>();
 builder.Services.AddTransient<ExportDats>();
+builder.Services.AddTransient<PatchItemsFromDB>();
 var host = builder.Build();
 
 var app = host.Services.GetRequiredService<CustomDats>();

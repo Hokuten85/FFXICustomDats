@@ -5,7 +5,7 @@ namespace FFXICustomDats.Data.XidbEntities;
 
 public partial class ItemFurnishing
 {
-    public ushort Itemid { get; set; }
+    public ushort ItemId { get; set; }
 
     public string Name { get; set; } = null!;
 

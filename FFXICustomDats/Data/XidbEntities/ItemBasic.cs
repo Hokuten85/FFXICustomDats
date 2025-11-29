@@ -5,7 +5,7 @@ namespace FFXICustomDats.Data.XidbEntities;
 
 public partial class ItemBasic
 {
-    public ushort Itemid { get; set; }
+    public ushort ItemId { get; set; }
 
     public ushort Subid { get; set; }
 

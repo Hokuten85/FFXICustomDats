@@ -1,25 +1,13 @@
-﻿using FFXICustomDats.Data;
-using FFXICustomDats.Data.XidbEntities;
-using FFXICustomDats.YamlModels.Items;
-using FFXICustomDats.YamlModels.Items.ItemAttributes;
+﻿using FFXICustomDats.YamlModels.Items;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace FFXICustomDats
 {
-    public class PatchYaml(IConfiguration config, XidbContext context)
+    public class PatchYaml(IConfiguration config, PatchItemsFromDB patch)
     {
-        private readonly XidbContext _context = context;
-        private readonly IConfiguration _config = config;
+        private readonly PatchItemsFromDB _patch = patch;
         private readonly string _exportDatDir = config.GetValue<string>("ExportDatDir");
         private readonly string _generateYamlDir = config.GetValue<string>("GenerateYamlDir");
         private readonly string _yamlPatchDir = config.GetValue<string>("YamlPatchDir");
@@ -62,35 +50,32 @@ namespace FFXICustomDats
 
         private void UpdateYamlFromDB<T>(string originalYamlFile) where T : Item
         {
-            Console.WriteLine($"Update Yaml from file xidb");
+            Console.WriteLine($"Update Yaml from xidb {originalYamlFile}");
             var origFilePath = Path.Combine(_exportDatDir, originalYamlFile);
             var newFilePath = Path.Combine(_generateYamlDir, $"new_{originalYamlFile}");
 
             var updateFilePath = Path.Exists(newFilePath) ? newFilePath : origFilePath;
             if (Path.Exists(updateFilePath))
             {
-                //var patchItems = GetItemsFromDB<ArmorItem>(items.Items.Select(x => x.Id));
-                
-
                 if (typeof(T) == typeof(ArmorItem))
                 {
-                    UpdateArmorItemFromDB(updateFilePath);
+                    UpdateArmorItemFromDB(updateFilePath, originalYamlFile);
                 }
                 else if (typeof(T) == typeof(FurnishingItem))
                 {
-
+                    UpdateFurnishingItemFromDB(updateFilePath, originalYamlFile);
                 }
                 else if (typeof(T) == typeof(PuppetItem))
                 {
-
+                    UpdatePuppetItemFromDB(updateFilePath, originalYamlFile);
                 }
                 else if (typeof(T) == typeof(UsableItem))
                 {
-
+                    UpdateUsableItemFromDB(updateFilePath, originalYamlFile);
                 }
                 else if (typeof(T) == typeof(WeaponItem))
                 {
-
+                    UpdateWeaponItemFromDB(updateFilePath, originalYamlFile);
                 }
             }
         }
@@ -173,99 +158,44 @@ namespace FFXICustomDats
             writetext.Write(yaml);
         }
 
-        private void UpdateArmorItemFromDB(string updateFilePath)
+        private void UpdateWeaponItemFromDB(string updateFilePath, string orginalFileName)
+        {
+            var items = Helpers.DeserializeYaml<WeaponItem>(updateFilePath);
+            _patch.UpdateWeaponItems(items.Items);
+
+            SerializeAndWriteFile(items, orginalFileName);
+        }
+
+        private void UpdateUsableItemFromDB(string updateFilePath, string orginalFileName)
+        {
+            var items = Helpers.DeserializeYaml<UsableItem>(updateFilePath);
+            _patch.UpdateUsableItems(items.Items);
+
+            SerializeAndWriteFile(items, orginalFileName);
+        }
+
+        private void UpdatePuppetItemFromDB(string updateFilePath, string orginalFileName)
+        {
+            var items = Helpers.DeserializeYaml<PuppetItem>(updateFilePath);
+            _patch.UpdatePuppetItems(items.Items);
+
+            SerializeAndWriteFile(items, orginalFileName);
+        }
+
+        private void UpdateFurnishingItemFromDB(string updateFilePath, string orginalFileName)
+        {
+            var items = Helpers.DeserializeYaml<FurnishingItem>(updateFilePath);
+            _patch.UpdateFurnishingItems(items.Items);
+
+            SerializeAndWriteFile(items, orginalFileName);
+        }
+
+        private void UpdateArmorItemFromDB(string updateFilePath, string orginalFileName)
         {
             var items = Helpers.DeserializeYaml<ArmorItem>(updateFilePath);
-            UpdateArmorItems(items);
+            _patch.UpdateArmorItems(items.Items);
 
-            SerializeAndWriteFile(items, new FileInfo(updateFilePath).Name);
-        }
-
-        private void UpdateArmorItems(FFXIItems<ArmorItem> items)
-        {
-            var itemIds = items.Items.Select(i => i.Id);
-
-            var dbItems = (from itemBasic in _context.ItemBasics.Where(x => itemIds.Contains(x.Itemid))
-                        join equipment in _context.ItemEquipments
-                            on itemBasic.Itemid equals equipment.ItemId
-                        join r in _context.ItemMods.Where(x => x.ModId == 276) //EQUIPMENT_ONLY_RACE
-                            on itemBasic.Itemid equals r.ItemId into rg
-                        from race in rg.DefaultIfEmpty()
-                        join u in _context.ItemUsables
-                            on itemBasic.Itemid equals u.Itemid into ug
-                        from usable in ug.DefaultIfEmpty()
-                        select new { itemBasic, equipment, race, usable }).ToList();
-
-            foreach (var item in items.Items)
-            {
-                var dbItem = dbItems.FirstOrDefault(x => x.itemBasic.Itemid == item.Id);
-                if (dbItem != null)
-                {
-                    UpdateItemBasic(item, dbItem.itemBasic);
-                    UpdateItemEquipment(item, dbItem.equipment, dbItem.race, dbItem.usable);
-                }
-            }
-        }
-
-        private void UpdateItemEquipment(ArmorItem item, ItemEquipment itemEquipment, ItemMod race, ItemUsable usable)
-        {
-            if (item.Equipment.Level != itemEquipment.Level)
-            {
-                item.Equipment.Level = itemEquipment.Level;
-            }
-
-            if (!SlotHelpers.IsEqual(item.Equipment.Slots, itemEquipment.Slot))
-            {
-                item.Equipment.Slots = Helpers.DBFlagsToYamlFlags(SlotHelpers.SlotMap, itemEquipment.Slot);
-            }
-
-            if (!JobHelpers.IsEqual(item.Equipment.Jobs, itemEquipment.Jobs))
-            {
-                item.Equipment.Jobs = JobHelpers.DBFlagsToYamlFlags(itemEquipment.Jobs);
-            }
-
-            if (item.Equipment.SuperiorLevel != itemEquipment.SuLevel)
-            {
-                item.Equipment.SuperiorLevel = itemEquipment.SuLevel;
-            }
-
-            if (item.Equipment.ShieldSize != itemEquipment.ShieldSize)
-            {
-                item.Equipment.ShieldSize = itemEquipment.ShieldSize;
-            }
-
-            if (item.Equipment.Ilevel != itemEquipment.Ilevel)
-            {
-                item.Equipment.Ilevel = itemEquipment.Ilevel;
-            }
-
-            if (race != null && _config.GetValue<bool>("TrustDatabaseRace")
-                && Helpers.ConvertEnumListToBit(item.Equipment.Races) != race.Value)
-            {
-                item.Equipment.Races = Helpers.BitsToEnumList<Race>((ushort)race.Value);
-            }
-
-            if (usable != null)
-            {
-                //validtargets
-                //maxcharges
-                //castingtime
-                //usedelay
-                //reusedelay
-            }
-        }
-
-        private void UpdateItemBasic(Item item, ItemBasic itemBasic)
-        {
-            if (!FlagHelpers.IsEqual(item.Flags, itemBasic.Flags))
-            {
-                item.Flags = Helpers.DBFlagsToYamlFlags(FlagHelpers.FlagMap, itemBasic.Flags);
-            }
-
-            if (item.StackSize != itemBasic.StackSize)
-            {
-                item.StackSize = itemBasic.StackSize;
-            }
+            SerializeAndWriteFile(items, orginalFileName);
         }
 
         private static class ObjectComparerUtility

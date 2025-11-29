@@ -27,5 +27,17 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 
         [YamlMember(Alias = "dark", ApplyNamingConventions = false)]
         public int Dark { get; set; }
-    }  
+    }
+
+    public static class ElementHelpers
+    {
+        public static bool IsEqual(int elementCharge, uint dbElements, Element element)
+        {
+            return elementCharge == GetPuppetElementValue(dbElements, element);
+        }
+        public static int GetPuppetElementValue(uint allElements, Element element)
+        {
+            return (int)(allElements >> ((int)(element - 1) * 4)) & 0xF;
+        }
+    }
 }

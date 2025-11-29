@@ -2,9 +2,9 @@
 {
     public enum SkillType { None = 0, Axe, Club, Dagger, Fishing, GreatAxe, GreatKatana, GreatSword, Handbell, HandToHand, Katana, Marksmanship, PoleArm, Ranged, Scythe, Special, Staff, StringInstrument, Sword, Thrown, WindInstrument };
 
-    public partial class SkillTypeConversion
+    public static class SkillTypeHelpers
     {
-        private enum SKILLTYPE
+        public enum SKILLTYPE
         {
             SKILL_NONE = 0,
             SKILL_HAND_TO_HAND = 1,
@@ -60,7 +60,7 @@
             SKILL_SPECIAL = 255,
         };
 
-        private readonly static Dictionary<SKILLTYPE, SkillType> SkillTypeDict = new()
+        public readonly static Dictionary<SKILLTYPE, SkillType> SkillTypeMap = new()
         {
             { SKILLTYPE.SKILL_AXE,               SkillType.Axe },
             { SKILLTYPE.SKILL_CLUB,              SkillType.Club },
@@ -85,14 +85,9 @@
             { SKILLTYPE.SKILL_WIND_INSTRUMENT,   SkillType.WindInstrument },
         };
 
-        public static SkillType ConvertSkillTypeToYaml(byte skillType)
+        public static bool IsEqual(SkillType yamlSkill, ushort dbSkill)
         {
-            if (SkillTypeDict.TryGetValue((SKILLTYPE)skillType, out SkillType yamlSkillType))
-            {
-                return yamlSkillType;
-            }
-
-            return SkillType.None;
+            return SkillTypeMap.TryGetValue((SKILLTYPE)dbSkill, out var skillType) && skillType == yamlSkill;
         }
-    }  
+    }
 }

@@ -3930,11 +3930,11 @@ public partial class XidbContext : DbContext
 
         modelBuilder.Entity<ItemBasic>(entity =>
         {
-            entity.HasKey(e => e.Itemid).HasName("PRIMARY");
+            entity.HasKey(e => e.ItemId).HasName("PRIMARY");
 
             entity.ToTable("item_basic");
 
-            entity.Property(e => e.Itemid)
+            entity.Property(e => e.ItemId)
                 .ValueGeneratedNever()
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("itemid");
@@ -4012,11 +4012,11 @@ public partial class XidbContext : DbContext
 
         modelBuilder.Entity<ItemFurnishing>(entity =>
         {
-            entity.HasKey(e => e.Itemid).HasName("PRIMARY");
+            entity.HasKey(e => e.ItemId).HasName("PRIMARY");
 
             entity.ToTable("item_furnishing");
 
-            entity.Property(e => e.Itemid)
+            entity.Property(e => e.ItemId)
                 .ValueGeneratedNever()
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("itemid");
@@ -4105,11 +4105,11 @@ public partial class XidbContext : DbContext
 
         modelBuilder.Entity<ItemPuppet>(entity =>
         {
-            entity.HasKey(e => e.Itemid).HasName("PRIMARY");
+            entity.HasKey(e => e.ItemId).HasName("PRIMARY");
 
             entity.ToTable("item_puppet");
 
-            entity.Property(e => e.Itemid)
+            entity.Property(e => e.ItemId)
                 .ValueGeneratedNever()
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("itemid");
@@ -4126,11 +4126,11 @@ public partial class XidbContext : DbContext
 
         modelBuilder.Entity<ItemUsable>(entity =>
         {
-            entity.HasKey(e => e.Itemid).HasName("PRIMARY");
+            entity.HasKey(e => e.ItemId).HasName("PRIMARY");
 
             entity.ToTable("item_usable");
 
-            entity.Property(e => e.Itemid)
+            entity.Property(e => e.ItemId)
                 .ValueGeneratedNever()
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("itemid");

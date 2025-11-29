@@ -1,4 +1,7 @@
-﻿using FFXICustomDats.YamlModels.Items.ItemAttributes;
+﻿using FFXICustomDats.Data;
+using FFXICustomDats.Data.XidbEntities;
+using FFXICustomDats.YamlModels.Items.ItemAttributes;
+using Microsoft.EntityFrameworkCore;
 using YamlDotNet.Serialization;
 
 namespace FFXICustomDats.YamlModels.Items.ItemTypes
@@ -29,6 +32,8 @@ namespace FFXICustomDats.YamlModels.Items.ItemTypes
         public List<ValidTarget> ValidTargets { get; set; } = [];
 
         [YamlMember(Alias = "icon_bytes", ApplyNamingConventions = false, Order = 20)]
-        public string IconBytes { get; set; }
+        public string? IconBytes { get; set; }
+
+        
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
-    public enum Flag { Zero = 0, CanEquip, CanSendPol, CanTradeNpc, CanUse, Ex, Flag01, Inscribable, Linkshell, MogGarden, MysteryBox, NoAuction, NoDelivery, NoSale, NoTradePC, Rare, Scroll, WallHanging };
+    public enum Flag { Zero = 0, CanEquip, CanSendPOL, CanTradeNPC, CanUse, Ex, Flag01, Inscribable, Linkshell, MogGarden, MysteryBox, NoAuction, NoDelivery, NoSale, NoTradePC, Rare, Scroll, WallHanging };
 
     public static class FlagHelpers
     {
@@ -32,13 +32,13 @@
             { ITEM_FLAG.ITEM_FLAG_01,           Flag.Flag01 },
             { ITEM_FLAG.ITEM_FLAG_MYSTERY_BOX,  Flag.MysteryBox },
             { ITEM_FLAG.ITEM_FLAG_MOG_GARDEN,   Flag.MogGarden },
-            { ITEM_FLAG.ITEM_FLAG_MAIL2ACCOUNT, Flag.CanSendPol },
+            { ITEM_FLAG.ITEM_FLAG_MAIL2ACCOUNT, Flag.CanSendPOL },
             { ITEM_FLAG.ITEM_FLAG_INSCRIBABLE,  Flag.Inscribable },
             { ITEM_FLAG.ITEM_FLAG_NOAUCTION,    Flag.NoAuction },
             { ITEM_FLAG.ITEM_FLAG_SCROLL,       Flag.Scroll },
             { ITEM_FLAG.ITEM_FLAG_LINKSHELL,    Flag.Linkshell },
             { ITEM_FLAG.ITEM_FLAG_CANUSE,       Flag.CanUse },
-            { ITEM_FLAG.ITEM_FLAG_CANTRADENPC,  Flag.CanTradeNpc },
+            { ITEM_FLAG.ITEM_FLAG_CANTRADENPC,  Flag.CanTradeNPC },
             { ITEM_FLAG.ITEM_FLAG_CANEQUIP,     Flag.CanEquip },
             { ITEM_FLAG.ITEM_FLAG_NOSALE,       Flag.NoSale },
             { ITEM_FLAG.ITEM_FLAG_NODELIVERY,   Flag.NoDelivery },
@@ -49,6 +49,7 @@
         public static bool IsEqual(List<Flag> flagList, ushort dbFlags)
         {
             var dbList = Helpers.DBFlagsToYamlFlags(FlagMap, dbFlags);
+
             return Helpers.AreEqual(flagList, dbList);
         }
     }

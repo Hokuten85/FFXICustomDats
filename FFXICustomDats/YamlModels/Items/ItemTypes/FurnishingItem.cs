@@ -7,7 +7,7 @@ namespace FFXICustomDats.YamlModels.Items.ItemTypes
     {
         public FurnishingItem() { }
 
-        [YamlMember(Alias = "furnishing", ApplyNamingConventions = false)]
+        [YamlMember(Alias = "furnishing", ApplyNamingConventions = false, Order = 8)]
         public Furnishing Furnishing { get; set; } = new Furnishing();
     }
 }
