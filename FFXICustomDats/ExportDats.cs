@@ -6,17 +6,18 @@ namespace FFXICustomDats
 {
     public class ExportDats(IConfiguration config)
     {
-        private readonly IConfiguration _config = config;
+        private readonly string _originalData = config.GetValue<string>("OriginalData") ?? string.Empty;
+        private readonly string _ffxiPath = config.GetValue<string>("FFXIPath") ?? string.Empty;
 
         public void ExportDatToYaml()
         {
-            ExportDatToYaml(@"ROM\118\109.dat", "armor.yml");
-            ExportDatToYaml(@"ROM\286\73.dat", "armor2.yml");
-            //ExportDatToYaml(@"ROM\118\106.DAT", "general_items.yml");
-            ExportDatToYaml(@"ROM\301\115.dat", "general_items2.yml");
-            ExportDatToYaml(@"ROM\118\110.dat", "puppet_items.yml");
-            ExportDatToYaml(@"ROM\118\107.dat", "usable_items.yml");
-            ExportDatToYaml(@"ROM\118\108.dat", "weapons.yml");
+            ExportDatToYaml(@"ROM\118\109.dat", @"items\armor.yml");
+            ExportDatToYaml(@"ROM\286\73.dat",  @"items\armor2.yml");
+            ExportDatToYaml(@"ROM\118\106.DAT", @"items\general_items.yml");
+            ExportDatToYaml(@"ROM\301\115.dat", @"items\general_items2.yml");
+            ExportDatToYaml(@"ROM\118\110.dat", @"items\puppet_items.yml");
+            ExportDatToYaml(@"ROM\118\107.dat", @"items\usable_items.yml");
+            ExportDatToYaml(@"ROM\118\108.dat", @"items\weapons.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
@@ -26,13 +27,12 @@ namespace FFXICustomDats
         {
             Console.WriteLine($"Exporting {datFile} to {yamlFile}");
 
-            var exportDatDir = _config.GetValue<string>("ExportDatDir");
-            var ffxiPath = $@"{_config.GetValue<string>("FFXIPath")}\{datFile}";
-            var outPath = $@"{exportDatDir}\{yamlFile}";
+            var ffxiPath = $@"{_ffxiPath}\{datFile}";
+            var outPath = $@"{_originalData}\{yamlFile}";
 
-            if (!Path.Exists(exportDatDir))
+            if (!Path.Exists(outPath))
             {
-                Directory.CreateDirectory(exportDatDir);
+                Directory.CreateDirectory(Path.GetDirectoryName(outPath) ?? string.Empty);
             }
 
             if (Path.Exists(ffxiPath))

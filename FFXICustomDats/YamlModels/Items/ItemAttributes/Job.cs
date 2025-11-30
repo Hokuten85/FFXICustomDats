@@ -1,4 +1,6 @@
-﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿using static FFXICustomDats.YamlModels.Items.ItemAttributes.FlagHelpers;
+
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public enum Job {
         Zero = 0,
@@ -39,7 +41,6 @@
 
         public readonly static Dictionary<JOBTYPE, Job> JobMap = new()
         {
-            //{ JOBTYPE.JOB_NON, Job.HumeMale },                      
             { JOBTYPE.JOB_WAR, Job.WAR },
             { JOBTYPE.JOB_MNK, Job.MNK },
             { JOBTYPE.JOB_WHM, Job.WHM },
@@ -62,13 +63,17 @@
             { JOBTYPE.JOB_SCH, Job.SCH },
             { JOBTYPE.JOB_GEO, Job.GEO },
             { JOBTYPE.JOB_RUN, Job.RUN },
-            //{ JOBTYPE.JOB_MON, Job.All },
             { JOBTYPE.JOB_ALL, Job.All },
         };
 
+        public static Dictionary<Job, JOBTYPE> ReverseJobMap()
+        {
+            return JobMap.ToDictionary(x => x.Value, y => y.Key);
+        }
+
         public static bool IsEqual(List<Job> jobList, uint dbJobs)
         {
-            var dbList = DBFlagsToYamlFlags(dbJobs);
+            var dbList = DBValueToYamlList(dbJobs);
             return Helpers.AreEqual(jobList, dbList);
         }
 
@@ -93,9 +98,18 @@
             return enumList;
         }
 
-        public static List<Job> DBFlagsToYamlFlags(uint dbValue)
+        public static List<Job> DBValueToYamlList(uint dbValue)
         {
             return [.. JobTypeBitsToEnumList(dbValue).Select(x => JobMap.TryGetValue(x, out var value) ? value : Job.Zero).Distinct()];
+        }
+
+        public static uint YamlListToDBValue(List<Job> jobList)
+        {
+            if (jobList.Contains(Job.All))
+            {
+                return (uint)JOBTYPE.JOB_ALL;
+            }
+            return Helpers.YamlListToDBValue(ReverseJobMap(), jobList.Where(x => x != Job.All));
         }
     }
 }

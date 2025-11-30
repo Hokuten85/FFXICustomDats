@@ -39,5 +39,10 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
         {
             return (int)(allElements >> ((int)(element - 1) * 4)) & 0xF;
         }
+
+        public static uint ElementToBitValue(int elementValue, Element element)
+        {
+            return (uint)(elementValue & 0xF) << (((int)element - 1) * 4);
+        }
     }
 }

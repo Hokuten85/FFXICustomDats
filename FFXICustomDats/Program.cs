@@ -15,6 +15,9 @@ builder.Services.AddTransient<CustomDats>();
 builder.Services.AddTransient<PatchYaml>();
 builder.Services.AddTransient<ExportDats>();
 builder.Services.AddTransient<PatchItemsFromDB>();
+builder.Services.AddTransient<WriteDats>();
+builder.Services.AddTransient<PatchDB>();
+builder.Services.AddTransient<PatchDBFromItems>();
 var host = builder.Build();
 
 var app = host.Services.GetRequiredService<CustomDats>();

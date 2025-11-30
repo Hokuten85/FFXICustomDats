@@ -1,9 +1,11 @@
 ﻿namespace FFXICustomDats
 {
-    public class CustomDats(PatchYaml patchYaml, ExportDats exportDats)
+    public class CustomDats(PatchYaml patchYaml, ExportDats exportDats, WriteDats writeDats, PatchDB patchDB)
     {
         private readonly PatchYaml _patchYaml = patchYaml;
         private readonly ExportDats _exportDats = exportDats;
+        private readonly WriteDats _writeDats = writeDats;
+        private readonly PatchDB _patchDB = patchDB;
 
         public void MainMenu()
         {
@@ -18,8 +20,9 @@
                 Console.WriteLine("\t2 - Apply xidb data to Yaml");
                 Console.WriteLine("\t3 - Apply patch file to Yaml");
                 Console.WriteLine("\t4 - Create Dats");
-                Console.WriteLine("\t5 - Clear GenerateYaml directory");
-                Console.WriteLine("\t6 - Quit");
+                Console.WriteLine("\t5 - Patch xidb from Dats");
+                Console.WriteLine("\t6 - Clear RawData directory");
+                Console.WriteLine("\t7 - Quit");
                 Console.WriteLine();
                 Console.WriteLine("Type a number, and then press Enter:");
 
@@ -37,12 +40,15 @@
                             _patchYaml.PatchYamlFromFiles();
                             break;
                         case 4:
-                            //_writeDats.WriteNewYaml();
+                            _writeDats.WriteYamlToDats();
                             break;
                         case 5:
-                            _patchYaml.ClearGenerateYamlDir();
+                            _patchDB.PatchXidbFromYaml();
                             break;
                         case 6:
+                            _patchYaml.ClearRawDataDir();
+                            break;
+                        case 7:
                             endApp = true;
                             break;
                     }

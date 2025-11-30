@@ -8,19 +8,19 @@ namespace FFXICustomDats
     public class PatchYaml(IConfiguration config, PatchItemsFromDB patch)
     {
         private readonly PatchItemsFromDB _patch = patch;
-        private readonly string _exportDatDir = config.GetValue<string>("ExportDatDir");
-        private readonly string _generateYamlDir = config.GetValue<string>("GenerateYamlDir");
-        private readonly string _yamlPatchDir = config.GetValue<string>("YamlPatchDir");
+        private readonly string _rawData = config.GetValue<string>("RawData") ?? string.Empty;
+        private readonly string _originalData = config.GetValue<string>("OriginalData") ?? string.Empty;
+        private readonly string _yamlPatches = config.GetValue<string>("YamlPatches") ?? string.Empty;
 
         public void PatchYamlFromXidb()
         {
-            UpdateYamlFromDB<ArmorItem>("armor.yml");
-            UpdateYamlFromDB<ArmorItem>("armor2.yml");
-            UpdateYamlFromDB<FurnishingItem>("general_items.yml");
-            UpdateYamlFromDB<FurnishingItem>("general_items2.yml");
-            UpdateYamlFromDB<PuppetItem>("puppet_items.yml");
-            UpdateYamlFromDB<UsableItem>("usable_items.yml");
-            UpdateYamlFromDB<WeaponItem>("weapons.yml");
+            UpdateYamlFromDB<ArmorItem>(@"items\armor.yml");
+            UpdateYamlFromDB<ArmorItem>(@"items\armor2.yml");
+            UpdateYamlFromDB<FurnishingItem>(@"items\general_items.yml");
+            UpdateYamlFromDB<FurnishingItem>(@"items\general_items2.yml");
+            UpdateYamlFromDB<PuppetItem>(@"items\puppet_items.yml");
+            UpdateYamlFromDB<UsableItem>(@"items\usable_items.yml");
+            UpdateYamlFromDB<WeaponItem>(@"items\weapons.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
@@ -28,89 +28,70 @@ namespace FFXICustomDats
 
         public void PatchYamlFromFiles()
         {
-            UpdateYamlFromFile<ArmorItem>("armor.yml", "armor_patch.yml");
-            UpdateYamlFromFile<ArmorItem>("armor2.yml", "armor2_patch.yml");
-            UpdateYamlFromFile<FurnishingItem>("general_items.yml", "general_items_patch.yml");
-            UpdateYamlFromFile<FurnishingItem>("general_items2.yml", "general_items2_patch.yml");
-            UpdateYamlFromFile<PuppetItem>("puppet_items.yml", "puppet_items_patch.yml");
-            UpdateYamlFromFile<UsableItem>("usable_items.yml", "usable_items_patch.yml");
-            UpdateYamlFromFile<WeaponItem>("weapons.yml", "weapons_patch.yml");
+            UpdateYamlFromFile<ArmorItem>(@"items\armor.yml", @"items\\armor_patch.yml");
+            UpdateYamlFromFile<ArmorItem>(@"items\armor2.yml", @"items\\armor2_patch.yml");
+            UpdateYamlFromFile<FurnishingItem>(@"items\general_items.yml", @"items\\general_items_patch.yml");
+            UpdateYamlFromFile<FurnishingItem>(@"items\general_items2.yml", @"items\\general_items2_patch.yml");
+            UpdateYamlFromFile<PuppetItem>(@"items\puppet_items.yml", @"items\\puppet_items_patch.yml");
+            UpdateYamlFromFile<UsableItem>(@"items\usable_items.yml", @"items\\usable_items_patch.yml");
+            UpdateYamlFromFile<WeaponItem>(@"items\weapons.yml", @"items\\weapons_patch.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
         }
 
-        public void ClearGenerateYamlDir()
+        public void ClearRawDataDir()
         {
-            foreach (FileInfo file in new DirectoryInfo(_generateYamlDir).EnumerateFiles())
+            foreach (FileInfo file in new DirectoryInfo(_rawData).EnumerateFiles())
             {
                 file.Delete();
             }
         }
 
-        private void UpdateYamlFromDB<T>(string originalYamlFile) where T : Item
+        private void UpdateYamlFromDB<T>(string fileName) where T : Item
         {
-            Console.WriteLine($"Update Yaml from xidb {originalYamlFile}");
-            var origFilePath = Path.Combine(_exportDatDir, originalYamlFile);
-            var newFilePath = Path.Combine(_generateYamlDir, $"new_{originalYamlFile}");
+            Console.WriteLine($"Update Yaml from xidb {fileName}");
+            var origFilePath = Path.Combine(_originalData, fileName);
+            var newFilePath = Path.Combine(_rawData, fileName);
 
             var updateFilePath = Path.Exists(newFilePath) ? newFilePath : origFilePath;
             if (Path.Exists(updateFilePath))
             {
-                if (typeof(T) == typeof(ArmorItem))
-                {
-                    UpdateArmorItemFromDB(updateFilePath, originalYamlFile);
-                }
-                else if (typeof(T) == typeof(FurnishingItem))
-                {
-                    UpdateFurnishingItemFromDB(updateFilePath, originalYamlFile);
-                }
-                else if (typeof(T) == typeof(PuppetItem))
-                {
-                    UpdatePuppetItemFromDB(updateFilePath, originalYamlFile);
-                }
-                else if (typeof(T) == typeof(UsableItem))
-                {
-                    UpdateUsableItemFromDB(updateFilePath, originalYamlFile);
-                }
-                else if (typeof(T) == typeof(WeaponItem))
-                {
-                    UpdateWeaponItemFromDB(updateFilePath, originalYamlFile);
-                }
+                UpdateItemsFromDB<T>(updateFilePath, newFilePath);
             }
         }
 
-        public void UpdateYamlFromFile<T>(string originalYamlFile, string patchFile) where T : Item
+        public void UpdateYamlFromFile<T>(string fileName, string patchFile) where T : Item
         {
-            Console.WriteLine($"Update Yaml from file {originalYamlFile}");
+            Console.WriteLine($"Update Yaml from file {fileName}");
 
-            var origFilePath = Path.Combine(_exportDatDir, originalYamlFile);
-            var newFilePath = Path.Combine(_generateYamlDir, $"new_{originalYamlFile}");
-            var patchFilePath = Path.Combine(_yamlPatchDir, patchFile);
+            var origFilePath = Path.Combine(_originalData, fileName);
+            var newFilePath = Path.Combine(_rawData, fileName);
+            var patchFilePath = Path.Combine(_yamlPatches, patchFile);
 
             var updateFilePath = Path.Exists(newFilePath) ? newFilePath : origFilePath;
             if (Path.Exists(updateFilePath) && Path.Exists(patchFilePath))
             {
                 Console.WriteLine($"Patching {updateFilePath} with {patchFilePath}");
-                var items = Helpers.DeserializeYaml<T>(origFilePath);
+                var items = Helpers.DeserializeYaml<T>(updateFilePath);
                 var patchItems = Helpers.DeserializeYaml<T>(patchFilePath);
 
-                DoPatchAndWriteFile(items, patchItems, originalYamlFile);
+                DoPatchAndWriteFile(items, patchItems, newFilePath);
             }
         }
 
-        private void DoPatchAndWriteFile<T>(FFXIItems<T> items, FFXIItems<T> patchItems, string originalYamlFile) where T : Item
+        private void DoPatchAndWriteFile<T>(FFXIItems<T> items, FFXIItems<T> patchItems, string filePath) where T : Item
         {
             Patch(items, patchItems);
-            SerializeAndWriteFile(items, originalYamlFile);
+            SerializeAndWriteFile(items, filePath);
         }
 
-        private void SerializeAndWriteFile<T>(FFXIItems<T> items, string originalYamlFile) where T : Item
+        private void SerializeAndWriteFile<T>(FFXIItems<T> items, string filePath) where T : Item
         {
             var yamlString = SerializeToYaml(items);
             if (!string.IsNullOrWhiteSpace(yamlString))
             {
-                WriteNewYamlFile(yamlString, originalYamlFile);
+                WriteNewYamlFile(yamlString, filePath);
             }
         }
 
@@ -146,78 +127,47 @@ namespace FFXICustomDats
             return serializer.Serialize(ffxiItems);
         }
 
-        private void WriteNewYamlFile(string yaml, string fileName)
+        private static void WriteNewYamlFile(string yaml, string filePath)
         {
-            Console.WriteLine($"Writing file {fileName}");
-            if (!Path.Exists(_generateYamlDir))
+            Console.WriteLine($"Writing file {filePath}");
+            if (!Path.Exists(filePath))
             {
-                Directory.CreateDirectory(_generateYamlDir);
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
             }
 
-            using StreamWriter writetext = new($@"{_generateYamlDir}\new_{fileName}");
+            using StreamWriter writetext = new(filePath);
             writetext.Write(yaml);
+            writetext.Flush();
+            writetext.Close();
+            writetext.Dispose();
         }
 
-        private void UpdateWeaponItemFromDB(string updateFilePath, string orginalFileName)
+        private void UpdateItemsFromDB<T>(string updateFilePath, string newFilePath) where T : Item
         {
-            var items = Helpers.DeserializeYaml<WeaponItem>(updateFilePath);
-            _patch.UpdateWeaponItems(items.Items);
+            var items = Helpers.DeserializeYaml<T>(updateFilePath);
 
-            SerializeAndWriteFile(items, orginalFileName);
-        }
-
-        private void UpdateUsableItemFromDB(string updateFilePath, string orginalFileName)
-        {
-            var items = Helpers.DeserializeYaml<UsableItem>(updateFilePath);
-            _patch.UpdateUsableItems(items.Items);
-
-            SerializeAndWriteFile(items, orginalFileName);
-        }
-
-        private void UpdatePuppetItemFromDB(string updateFilePath, string orginalFileName)
-        {
-            var items = Helpers.DeserializeYaml<PuppetItem>(updateFilePath);
-            _patch.UpdatePuppetItems(items.Items);
-
-            SerializeAndWriteFile(items, orginalFileName);
-        }
-
-        private void UpdateFurnishingItemFromDB(string updateFilePath, string orginalFileName)
-        {
-            var items = Helpers.DeserializeYaml<FurnishingItem>(updateFilePath);
-            _patch.UpdateFurnishingItems(items.Items);
-
-            SerializeAndWriteFile(items, orginalFileName);
-        }
-
-        private void UpdateArmorItemFromDB(string updateFilePath, string orginalFileName)
-        {
-            var items = Helpers.DeserializeYaml<ArmorItem>(updateFilePath);
-            _patch.UpdateArmorItems(items.Items);
-
-            SerializeAndWriteFile(items, orginalFileName);
-        }
-
-        private static class ObjectComparerUtility
-        {
-            public static bool ObjectsAreEqual<T>(T obj1, T obj2, bool makeEqual = false)
+            if (typeof(T) == typeof(ArmorItem))
             {
-                var areEqual = true;
-                foreach (var prop in obj1.GetType().GetProperties())
-                {
-                    if (!prop.GetValue(obj1).Equals(prop.GetValue(obj2)))
-                    {
-                        areEqual = false;
-
-                        if (makeEqual)
-                        {
-                            prop.SetValue(obj1, prop.GetValue(obj2));
-                        }
-                    }
-                }
-
-                return areEqual;
+                _patch.UpdateArmorItems(items.Items as ArmorItem[] ?? []);
             }
+            else if (typeof(T) == typeof(FurnishingItem))
+            {
+                _patch.UpdateFurnishingItems(items.Items as FurnishingItem[] ?? []);
+            }
+            else if (typeof(T) == typeof(PuppetItem))
+            {
+                _patch.UpdatePuppetItems(items.Items as PuppetItem[] ?? []);
+            }
+            else if (typeof(T) == typeof(UsableItem))
+            {
+                _patch.UpdateUsableItems(items.Items as UsableItem[] ?? []);
+            }
+            else if (typeof(T) == typeof(WeaponItem))
+            {
+                _patch.UpdateWeaponItems(items.Items as WeaponItem[] ?? []);
+            }
+
+            SerializeAndWriteFile(items, newFilePath);
         }
     }
 }

@@ -1,6 +1,25 @@
 ﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
-    public enum Flag { Zero = 0, CanEquip, CanSendPOL, CanTradeNPC, CanUse, Ex, Flag01, Inscribable, Linkshell, MogGarden, MysteryBox, NoAuction, NoDelivery, NoSale, NoTradePC, Rare, Scroll, WallHanging };
+    public enum Flag {
+        Zero = 0,
+        CanEquip,
+        CanSendPOL,
+        CanTradeNPC,
+        CanUse,
+        Ex,
+        Flag01,
+        Inscribable,
+        Linkshell,
+        MogGarden,
+        MysteryBox,
+        NoAuction,
+        NoDelivery,
+        NoSale,
+        NoTradePC,
+        Rare,
+        Scroll,
+        WallHanging
+    };
 
     public static class FlagHelpers
     {
@@ -46,9 +65,16 @@
             { ITEM_FLAG.ITEM_FLAG_RARE,         Flag.Rare }
         };
 
+        public static Dictionary<Flag, ITEM_FLAG> ReverseFlagMap()
+        {
+            var reverseMap = FlagMap.ToDictionary(x => x.Value, y => y.Key);
+            reverseMap.Add(Flag.NoTradePC, ITEM_FLAG.ITEM_FLAG_EX);
+            return reverseMap;
+        }
+
         public static bool IsEqual(List<Flag> flagList, ushort dbFlags)
         {
-            var dbList = Helpers.DBFlagsToYamlFlags(FlagMap, dbFlags);
+            var dbList = Helpers.DBValueToYamlList(FlagMap, dbFlags);
 
             return Helpers.AreEqual(flagList, dbList);
         }

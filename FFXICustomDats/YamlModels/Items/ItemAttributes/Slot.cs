@@ -1,4 +1,7 @@
-﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿using static FFXICustomDats.YamlModels.Items.ItemAttributes.JobHelpers;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
     public enum Slot { None = 0, Back, Body, Ears, Feet, Hands, Head, Legs, Neck, Rings, Sub, Waist, Ammo, Range, Main, Attachment };
 
@@ -47,9 +50,31 @@
             { SLOTTYPE.SLOT_BACK, Slot.Back },
         };
 
+        public static Dictionary<Slot, SLOTTYPE> ReverseSlotMap()
+        {
+            return SlotMap.Where(x => !(new[] { SLOTTYPE.SLOT_EAR2, SLOTTYPE.SLOT_RING2 }).Contains(x.Key)).ToDictionary(x => x.Value, y => y.Key);
+        }
+
+        public static ushort YamlListToDBValue(List<Slot> slotList)
+        {
+            var dbValue = (ushort)Helpers.YamlListToDBValue(ReverseSlotMap(), slotList);
+
+            if (slotList.Contains(Slot.Ears))
+            {
+                dbValue |= 1 << ((int)SLOTTYPE.SLOT_EAR2 - 1);
+            }
+
+            if (slotList.Contains(Slot.Rings))
+            {
+                dbValue |= 1 << ((int)SLOTTYPE.SLOT_RING2 - 1);
+            }
+
+            return dbValue;
+        }
+
         public static bool IsEqual(List<Slot> slotList, ushort dbSlots)
         {
-            var dbList = Helpers.DBFlagsToYamlFlags(SlotMap, dbSlots);
+            var dbList = Helpers.DBValueToYamlList(SlotMap, dbSlots);
             return Helpers.AreEqual(slotList, dbList);
         }
     }

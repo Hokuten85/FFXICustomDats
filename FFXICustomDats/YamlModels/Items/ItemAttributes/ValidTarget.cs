@@ -34,7 +34,7 @@
 
         public static bool IsEqual(List<ValidTarget> slotList, ushort dbValidTargets)
         {
-            var dbList = Helpers.DBFlagsToYamlFlags(ValidTargetMap, dbValidTargets);
+            var dbList = Helpers.DBValueToYamlList(ValidTargetMap, dbValidTargets);
             return Helpers.AreEqual(slotList, dbList);
         }
     }

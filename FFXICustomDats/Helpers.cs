@@ -1,13 +1,6 @@
 ﻿using FFXICustomDats.YamlModels.Items;
 using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -102,9 +95,14 @@ namespace FFXICustomDats
             return list1.All(list2.Contains) && list1.Count == list2.Count;
         }
 
-        public static List<T> DBFlagsToYamlFlags<dbT, T>(Dictionary<dbT, T> enumMap, ushort dbValue) where T : Enum where dbT : Enum
+        public static List<T> DBValueToYamlList<dbT, T>(Dictionary<dbT, T> enumMap, ushort dbValue) where T : Enum where dbT : Enum
         {
             return [.. Helpers.BitsToEnumList<dbT>(dbValue).Select(x => enumMap.TryGetValue(x, out var value) ? value : (T)Enum.Parse(typeof(T), 0.ToString())).Distinct()];
+        }
+
+        public static uint YamlListToDBValue<T, dbT>(Dictionary<T, dbT> enumMap, IEnumerable<T> yamlList) where T : Enum where dbT : Enum
+        {
+            return (uint)yamlList.Select(x => enumMap.TryGetValue(x, out var dbValue) ? Convert.ToInt32(dbValue) : 0).Aggregate(0, (total, next) => total | 1 << (next - 1));
         }
     }
 }

@@ -1,10 +1,35 @@
-﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿using static FFXICustomDats.YamlModels.Items.ItemAttributes.JobHelpers;
+
+namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {
-    public enum SkillType { None = 0, Axe, Club, Dagger, Fishing, GreatAxe, GreatKatana, GreatSword, Handbell, HandToHand, Katana, Marksmanship, PoleArm, Ranged, Scythe, Special, Staff, StringInstrument, Sword, Thrown, WindInstrument };
+    public enum SkillType 
+    { 
+        None = 0, 
+        Axe, 
+        Club, 
+        Dagger, 
+        Fishing, 
+        GreatAxe, 
+        GreatKatana, 
+        GreatSword, 
+        Handbell, 
+        HandToHand, 
+        Katana, 
+        Marksmanship, 
+        PoleArm, 
+        Ranged, 
+        Scythe, 
+        Special, 
+        Staff, 
+        StringInstrument, 
+        Sword, 
+        Thrown, 
+        WindInstrument
+    };
 
     public static class SkillTypeHelpers
     {
-        public enum SKILLTYPE
+        public enum SKILL_TYPE
         {
             SKILL_NONE = 0,
             SKILL_HAND_TO_HAND = 1,
@@ -60,34 +85,39 @@
             SKILL_SPECIAL = 255,
         };
 
-        public readonly static Dictionary<SKILLTYPE, SkillType> SkillTypeMap = new()
+        public readonly static Dictionary<SKILL_TYPE, SkillType> SkillTypeMap = new()
         {
-            { SKILLTYPE.SKILL_AXE,               SkillType.Axe },
-            { SKILLTYPE.SKILL_CLUB,              SkillType.Club },
-            { SKILLTYPE.SKILL_DAGGER,            SkillType.Dagger },
-            { SKILLTYPE.SKILL_FISHING,           SkillType.Fishing },
-            { SKILLTYPE.SKILL_GREAT_AXE,         SkillType.GreatAxe },
-            { SKILLTYPE.SKILL_GREAT_KATANA,      SkillType.GreatKatana },
-            { SKILLTYPE.SKILL_GREAT_SWORD,       SkillType.GreatSword },
-            { SKILLTYPE.SKILL_HANDBELL,          SkillType.Handbell },
-            { SKILLTYPE.SKILL_HAND_TO_HAND,      SkillType.HandToHand },
-            { SKILLTYPE.SKILL_KATANA,            SkillType.Katana },
-            { SKILLTYPE.SKILL_MARKSMANSHIP,      SkillType.Marksmanship },
-            { SKILLTYPE.SKILL_NONE,              SkillType.None },
-            { SKILLTYPE.SKILL_POLEARM,           SkillType.PoleArm },
-            { SKILLTYPE.SKILL_ARCHERY,           SkillType.Ranged },
-            { SKILLTYPE.SKILL_SCYTHE,            SkillType.Scythe },
-            { SKILLTYPE.SKILL_SPECIAL,           SkillType.Special },
-            { SKILLTYPE.SKILL_STAFF,             SkillType.Staff },
-            { SKILLTYPE.SKILL_STRING_INSTRUMENT, SkillType.StringInstrument },
-            { SKILLTYPE.SKILL_SWORD,             SkillType.Sword },
-            { SKILLTYPE.SKILL_THROWING,          SkillType.Thrown },
-            { SKILLTYPE.SKILL_WIND_INSTRUMENT,   SkillType.WindInstrument },
+            { SKILL_TYPE.SKILL_AXE,               SkillType.Axe },
+            { SKILL_TYPE.SKILL_CLUB,              SkillType.Club },
+            { SKILL_TYPE.SKILL_DAGGER,            SkillType.Dagger },
+            { SKILL_TYPE.SKILL_FISHING,           SkillType.Fishing },
+            { SKILL_TYPE.SKILL_GREAT_AXE,         SkillType.GreatAxe },
+            { SKILL_TYPE.SKILL_GREAT_KATANA,      SkillType.GreatKatana },
+            { SKILL_TYPE.SKILL_GREAT_SWORD,       SkillType.GreatSword },
+            { SKILL_TYPE.SKILL_HANDBELL,          SkillType.Handbell },
+            { SKILL_TYPE.SKILL_HAND_TO_HAND,      SkillType.HandToHand },
+            { SKILL_TYPE.SKILL_KATANA,            SkillType.Katana },
+            { SKILL_TYPE.SKILL_MARKSMANSHIP,      SkillType.Marksmanship },
+            { SKILL_TYPE.SKILL_NONE,              SkillType.None },
+            { SKILL_TYPE.SKILL_POLEARM,           SkillType.PoleArm },
+            { SKILL_TYPE.SKILL_ARCHERY,           SkillType.Ranged },
+            { SKILL_TYPE.SKILL_SCYTHE,            SkillType.Scythe },
+            { SKILL_TYPE.SKILL_SPECIAL,           SkillType.Special },
+            { SKILL_TYPE.SKILL_STAFF,             SkillType.Staff },
+            { SKILL_TYPE.SKILL_STRING_INSTRUMENT, SkillType.StringInstrument },
+            { SKILL_TYPE.SKILL_SWORD,             SkillType.Sword },
+            { SKILL_TYPE.SKILL_THROWING,          SkillType.Thrown },
+            { SKILL_TYPE.SKILL_WIND_INSTRUMENT,   SkillType.WindInstrument },
         };
+
+        public static Dictionary<SkillType, SKILL_TYPE> ReverseSkillTypeMap()
+        {
+            return SkillTypeMap.ToDictionary(x => x.Value, y => y.Key);
+        }
 
         public static bool IsEqual(SkillType yamlSkill, ushort dbSkill)
         {
-            return SkillTypeMap.TryGetValue((SKILLTYPE)dbSkill, out var skillType) && skillType == yamlSkill;
+            return SkillTypeMap.TryGetValue((SKILL_TYPE)dbSkill, out var skillType) && skillType == yamlSkill;
         }
     }
 }
