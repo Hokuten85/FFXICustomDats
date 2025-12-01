@@ -1,6 +1,7 @@
 ﻿using FFXICustomDats.Data;
 using FFXICustomDats.Data.XidbEntities;
 using FFXICustomDats.YamlModels.Items.ItemAttributes;
+using FFXICustomDats.YamlModels.SharedAttributes;
 using Microsoft.EntityFrameworkCore;
 using YamlDotNet.Serialization;
 

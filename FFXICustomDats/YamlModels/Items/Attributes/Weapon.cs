@@ -1,4 +1,5 @@
-﻿using YamlDotNet.Serialization;
+﻿using FFXICustomDats.YamlModels.SharedAttributes;
+using YamlDotNet.Serialization;
 
 namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 {

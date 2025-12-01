@@ -1,4 +1,4 @@
-﻿using static FFXICustomDats.YamlModels.Items.ItemAttributes.JobHelpers;
+﻿using static FFXICustomDats.YamlModels.SharedAttributes.JobHelpers;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace FFXICustomDats.YamlModels.Items.ItemAttributes

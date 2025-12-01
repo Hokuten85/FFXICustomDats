@@ -1,10 +1,30 @@
-﻿using static FFXICustomDats.YamlModels.Items.ItemAttributes.FlagHelpers;
-
-namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿namespace FFXICustomDats.YamlModels.SharedAttributes
 {
     public enum Job {
-        Zero = 0,
-        WAR, MNK, WHM, BLM, RDM, THF, PLD, DRK, BST, BRD, RNG, SAM, NIN, DRG, SMN, BLU, COR, PUP, DNC, SCH, GEO, RUN,
+        Zero = 0, 
+        WAR = 1,
+        MNK = 2,
+        WHM = 3,
+        BLM = 4,
+        RDM = 5,
+        THF = 6,
+        PLD = 7,
+        DRK = 8,
+        BST = 9,
+        BRD = 10,
+        RNG = 11,
+        SAM = 12,
+        NIN = 13,
+        DRG = 14,
+        SMN = 15,
+        BLU = 16,
+        COR = 17,
+        PUP = 18,
+        DNC = 19,
+        SCH = 20,
+        GEO = 21,
+        RUN = 22,
+        MON = 23,
         All = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 | 0x800 | 0x1000 | 0x2000 | 0x4000 | 0x8000 | 0x10000 | 0x20000 | 0x40000 | 0x80000 | 0x100000 | 0x200000
     };
 

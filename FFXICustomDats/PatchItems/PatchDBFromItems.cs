@@ -2,11 +2,12 @@
 using FFXICustomDats.Data.XidbEntities;
 using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
+using FFXICustomDats.YamlModels.SharedAttributes;
 using Microsoft.Extensions.Configuration;
 
-namespace FFXICustomDats
+namespace FFXICustomDats.PatchItems
 {
-    public class PatchItemsFromDB(IConfiguration config, XidbContext context)
+    public class PatchDBFromItems(IConfiguration config, XidbContext context)
     {
         private readonly XidbContext _context = context;
         private readonly IConfiguration _config = config;
@@ -24,6 +25,8 @@ namespace FFXICustomDats
                     UpdateItemBasic(item, dbItem);
                 }
             }
+
+            _context.SaveChanges();
         }
 
         public void UpdateArmorItems(ArmorItem[] items)
@@ -50,6 +53,8 @@ namespace FFXICustomDats
                     UpdateItemUsable(item, dbItem.usable);
                 }
             }
+
+            _context.SaveChanges();
         }
 
         public void UpdateFurnishingItems(FurnishingItem[] items)
@@ -67,6 +72,8 @@ namespace FFXICustomDats
                     UpdateItemFurnishing(item, dbItem);
                 }
             }
+
+            _context.SaveChanges();
         }
 
         public void UpdatePuppetItems(PuppetItem[] items)
@@ -84,6 +91,8 @@ namespace FFXICustomDats
                     UpdateItemPuppet(item, dbItem);
                 }
             }
+
+            _context.SaveChanges();
         }
 
         public void UpdateUsableItems(UsableItem[] items)
@@ -101,6 +110,8 @@ namespace FFXICustomDats
                     UpdateItemUsable(item, dbItem);
                 }
             }
+
+            _context.SaveChanges();
         }
 
         public void UpdateWeaponItems(WeaponItem[] items)
@@ -119,135 +130,150 @@ namespace FFXICustomDats
                     UpdateItemWeapon(item, dbItem);
                 }
             }
+
+            _context.SaveChanges();
         }
 
-        public static void UpdateItemWeapon(WeaponItem item, ItemWeapon weapon)
+        public void UpdateItemWeapon(WeaponItem item, ItemWeapon weapon)
         {
             if (weapon != null)
             {
-                var dbDamage = weapon.Dmg;
-                if ((SkillTypeHelpers.SKILL_TYPE)weapon.Skill == SkillTypeHelpers.SKILL_TYPE.SKILL_HAND_TO_HAND)
+                var yamlDmg = item.Weapon.Damage;
+                if (item.Weapon.SkillType == SkillType.HandToHand)
                 {
-                    dbDamage += 3; // h2h starts at 3 + h2h skill scaling. Dats seem to factor in the 3 into the weapon dmg
+                    yamlDmg -= 3; // h2h starts at 3 + h2h skill scaling. Dats seem to factor in the 3 into the weapon dmg
                 }
 
-                if (item.Weapon.Damage != dbDamage)
+                if (yamlDmg > 0 && weapon.Dmg != yamlDmg)
                 {
-                    item.Weapon.Damage = dbDamage;
+                    weapon.Dmg = yamlDmg;
                 }
 
-                var dbDelay = weapon.Delay;
-                if ((SkillTypeHelpers.SKILL_TYPE)weapon.Skill == SkillTypeHelpers.SKILL_TYPE.SKILL_HAND_TO_HAND)
+                var yamlDelay = item.Weapon.Delay;
+                if (item.Weapon.SkillType == SkillType.HandToHand)
                 {
-                    dbDelay = weapon.Delay - 480 + 240; // database h2h delay starts at 480, then adds the weapon delay. Dat delays for h2h seem to be the standard delay of 240 + the weapon delay
+                    yamlDelay = item.Weapon.Delay - 240 + 480; // database h2h delay starts at 480, then adds the weapon delay. Dat delays for h2h seem to be the standard delay of 240 + the weapon delay
                 }
 
-                if (dbDelay > 0 && item.Weapon.Delay != dbDelay)
+                if (yamlDelay > 0 && weapon.Delay != yamlDelay)
                 {
-                    item.Weapon.Delay = dbDelay;
-                }
-
-                if (dbDelay > 0 && (item.Weapon.Damage != dbDamage || item.Weapon.Delay != dbDelay)
-                    && item.Weapon.DPS != (int)Math.Round(dbDamage * 60.0 / dbDelay * 100))
-                {
-                    item.Weapon.DPS = (int)Math.Round(dbDamage * 60.0 / dbDelay * 100);
+                    weapon.Delay = yamlDelay;
                 }
 
                 if (!SkillTypeHelpers.IsEqual(item.Weapon.SkillType, weapon.Skill))
                 {
-                    item.Weapon.SkillType = SkillTypeHelpers.SkillTypeMap.GetValueOrDefault((SkillTypeHelpers.SKILL_TYPE)weapon.Skill);
-
+                    weapon.Skill = (byte)(SkillTypeHelpers.ReverseSkillTypeMap().TryGetValue(item.Weapon.SkillType, out var skillType) ? skillType : 0);
                 }
+
+                _context.ItemWeapons.Update(weapon);
             }
         }
 
-        public static void UpdateItemPuppet(PuppetItem item, ItemPuppet puppet)
+        public void UpdateItemPuppet(PuppetItem item, ItemPuppet puppet)
         {
             if (puppet != null)
             {
                 if (item.Puppet.Slot != (PuppetSlot)puppet.Slot)
                 {
-                    item.Puppet.Slot = (PuppetSlot)puppet.Slot;
+                    puppet.Slot = (byte)item.Puppet.Slot;
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Fire, puppet.Element, Element.Fire))
                 {
-                    item.Puppet.ElementCharge.Fire = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Fire);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Fire, Element.Fire);
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Ice, puppet.Element, Element.Ice))
                 {
-                    item.Puppet.ElementCharge.Ice = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Ice);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Ice, Element.Ice);
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Wind, puppet.Element, Element.Air))
                 {
-                    item.Puppet.ElementCharge.Wind = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Air);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Wind, Element.Air);
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Earth, puppet.Element, Element.Earth))
                 {
-                    item.Puppet.ElementCharge.Earth = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Earth);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Earth, Element.Earth);
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Lightning, puppet.Element, Element.Thunder))
                 {
-                    item.Puppet.ElementCharge.Lightning = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Thunder);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Lightning, Element.Thunder);
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Water, puppet.Element, Element.Water))
                 {
-                    item.Puppet.ElementCharge.Water = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Water);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Water, Element.Water);
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Light, puppet.Element, Element.Light))
                 {
-                    item.Puppet.ElementCharge.Light = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Light);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Light, Element.Light);
                 }
 
                 if (!ElementHelpers.IsEqual(item.Puppet.ElementCharge.Dark, puppet.Element, Element.Fire))
                 {
-                    item.Puppet.ElementCharge.Dark = ElementHelpers.GetPuppetElementValue(puppet.Element, Element.Dark);
+                    puppet.Element |= ElementHelpers.ElementToBitValue(item.Puppet.ElementCharge.Dark, Element.Dark);
                 }
+
+                _context.ItemPuppets.Update(puppet);
             }
         }
 
-        public static void UpdateItemFurnishing(FurnishingItem item, ItemFurnishing furnishing)
+        public void UpdateItemFurnishing(FurnishingItem item, ItemFurnishing furnishing)
         {
             if (furnishing != null)
             {
                 if (item.Furnishing.Element != (Element)furnishing.Element)
                 {
-                    item.Furnishing.Element = (Element)furnishing.Element;
+                    furnishing.Element = (byte)item.Furnishing.Element;
                 }
 
                 if (item.Furnishing.StorageSlots != furnishing.Storage)
                 {
-                    item.Furnishing.StorageSlots = furnishing.Storage;
+                    furnishing.Storage = (byte)item.Furnishing.StorageSlots;
                 }
+
+                _context.ItemFurnishings.Update(furnishing);
             }
         }
 
         public void UpdateItemMod(ArmorItem item, ItemMod race)
         {
-            if (race != null && _config.GetValue<bool>("TrustDatabaseRace")
-                && Helpers.ConvertEnumListToBit(item.Equipment.Races) != race.Value)
+            if (race != null)
             {
-                item.Equipment.Races = Helpers.BitsToEnumList<Race>((ushort)race.Value);
+                if (Helpers.ConvertEnumListToBit(item.Equipment.Races) != race.Value)
+                {
+                    race.Value = (short)Helpers.ConvertEnumListToBit(item.Equipment.Races);
+                    _context.ItemMods.Update(race);
+                }
+            }
+            else if (!item.Equipment.Races.Contains(Race.All))
+            {
+                _context.ItemMods.Add(new ItemMod()
+                {
+                    ItemId = item.Id,
+                    ModId = 276,
+                    Value = (short)Helpers.ConvertEnumListToBit(item.Equipment.Races)
+                });
             }
         }
 
-        public static void UpdateItemUsable(UsableItem item, ItemUsable usable)
+        public void UpdateItemUsable(UsableItem item, ItemUsable usable)
         {
             if (usable != null) {
                 if (item.Usable.ActivationTime != usable.Activation)
                 {
-                    item.Usable.ActivationTime = usable.Activation;
+                    usable.Activation = (byte)item.Usable.ActivationTime;
                 }
+
+                _context.ItemUsables.Update(usable);
             }
         }
 
-        public static void UpdateItemUsable(ArmorItem item, ItemUsable usable)
+        public void UpdateItemUsable(ArmorItem item, ItemUsable usable)
         {
             if (usable != null)
             {
@@ -259,7 +285,7 @@ namespace FFXICustomDats
 
                 if (item.Equipment.MaxCharges != usable.MaxCharges)
                 {
-                    item.Equipment.MaxCharges = usable.MaxCharges;
+                    usable.MaxCharges = item.Equipment.MaxCharges;
                 }
 
                 // some significant differences between db and dats. going to skip for now
@@ -270,65 +296,71 @@ namespace FFXICustomDats
 
                 if (item.Equipment.UseDelay != usable.UseDelay)
                 {
-                    item.Equipment.UseDelay = usable.UseDelay;
+                    usable.UseDelay = item.Equipment.UseDelay;
                 }
 
                 if (item.Equipment.ReuseDelay != usable.ReuseDelay)
                 {
-                    item.Equipment.ReuseDelay = usable.ReuseDelay;
+                    usable.ReuseDelay = item.Equipment.ReuseDelay;
                 }
+
+                _context.ItemUsables.Update(usable);
             }
         }
 
-        public static void UpdateItemEquipment(ArmorItem item, ItemEquipment equipment)
+        public void UpdateItemEquipment(ArmorItem item, ItemEquipment equipment)
         {
             if (equipment != null)
             {
                 if (item.Equipment.Level != equipment.Level)
                 {
-                    item.Equipment.Level = equipment.Level;
+                    equipment.Level = (byte)item.Equipment.Level;
                 }
 
                 if (!SlotHelpers.IsEqual(item.Equipment.Slots, equipment.Slot))
                 {
-                    item.Equipment.Slots = Helpers.DBValueToYamlList(SlotHelpers.SlotMap, equipment.Slot);
+                    equipment.Slot = SlotHelpers.YamlListToDBValue(item.Equipment.Slots);
                 }
 
                 if (!JobHelpers.IsEqual(item.Equipment.Jobs, equipment.Jobs))
                 {
-                    item.Equipment.Jobs = JobHelpers.DBValueToYamlList(equipment.Jobs);
+                    equipment.Jobs = JobHelpers.YamlListToDBValue(item.Equipment.Jobs);
                 }
 
                 if (item.Equipment.SuperiorLevel != equipment.SuLevel)
                 {
-                    item.Equipment.SuperiorLevel = equipment.SuLevel;
+                    equipment.SuLevel = item.Equipment.SuperiorLevel;
                 }
 
                 if (item.Equipment.ShieldSize != equipment.ShieldSize)
                 {
-                    item.Equipment.ShieldSize = equipment.ShieldSize;
+                    equipment.ShieldSize = item.Equipment.ShieldSize;
                 }
 
                 if (item.Equipment.Ilevel != equipment.Ilevel)
                 {
-                    item.Equipment.Ilevel = equipment.Ilevel;
+                    equipment.Ilevel = item.Equipment.Ilevel;
                 }
+
+                _context.ItemEquipments.Update(equipment);
             }
         }
 
-        public static void UpdateItemBasic(Item item, ItemBasic itemBasic)
+        public void UpdateItemBasic(Item item, ItemBasic itemBasic)
         {
             if (itemBasic != null)
             {
                 if (!FlagHelpers.IsEqual(item.Flags, itemBasic.Flags))
                 {
-                    item.Flags = Helpers.DBValueToYamlList(FlagHelpers.FlagMap, itemBasic.Flags);
+                    itemBasic.Flags = (ushort)Helpers.YamlListToDBValue(FlagHelpers.ReverseFlagMap(), item.Flags);
                 }
 
                 if (item.StackSize != itemBasic.StackSize)
                 {
-                    item.StackSize = itemBasic.StackSize;
+                    itemBasic.StackSize = item.StackSize;
                 }
+
+                _context.ItemBasics.Update(itemBasic);
             }
         }
     }

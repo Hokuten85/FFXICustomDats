@@ -1,6 +1,9 @@
-﻿using FFXICustomDats.YamlModels.Items;
+﻿using FFXICustomDats.YamlConverters;
+using FFXICustomDats.YamlModels;
+using FFXICustomDats.YamlModels.Items;
 using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
+using FFXICustomDats.YamlModels.SharedAttributes;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -8,18 +11,34 @@ namespace FFXICustomDats
 {
     public static class Helpers
     {
-        public static FFXIItems<T> DeserializeYaml<T>(string filePath) where T : Item
+        public static XIItems<T> DeserializeYaml<T>(string filePath) where T : Item
         {
+            var (deserializer, input) = GetInputAndDeserializer(filePath);
+
+            return deserializer.Deserialize<XIItems<T>>(input);
+        }
+
+        public static XIDataMenu DeserializeYaml(string filePath)
+        {
+            var (deserializer, input) = GetInputAndDeserializer(filePath);
+
+            return deserializer.Deserialize<XIDataMenu>(input);
+        }
+
+        private static (IDeserializer, StringReader) GetInputAndDeserializer(string filePath)
+        {
+            var customerConverter = new EntriesTypeConverter();
             FileStream fileStream = new(filePath, FileMode.Open);
             using var reader = new StreamReader(fileStream);
 
-            var input = new StringReader(reader.ReadToEnd());
-            var deserializer = new DeserializerBuilder()
+            return (
+                new DeserializerBuilder()
+                    .WithTypeConverter(customerConverter)
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                     .IgnoreUnmatchedProperties()
-                    .Build();
-
-            return deserializer.Deserialize<FFXIItems<T>>(input);
+                    .Build(),
+                new StringReader(reader.ReadToEnd())
+            );
         }
 
         public static List<T> BitsToEnumList<T>(ushort bits) where T : Enum

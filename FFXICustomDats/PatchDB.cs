@@ -1,4 +1,5 @@
 ﻿using FFXICustomDats.Data;
+using FFXICustomDats.PatchItems;
 using FFXICustomDats.YamlModels.Items;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
 using Microsoft.Extensions.Configuration;

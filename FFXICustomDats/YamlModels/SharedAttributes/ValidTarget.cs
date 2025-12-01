@@ -1,6 +1,6 @@
-﻿namespace FFXICustomDats.YamlModels.Items.ItemAttributes
+﻿namespace FFXICustomDats.YamlModels.SharedAttributes
 {
-    public enum ValidTarget { Zero = 0, Corpse, Enemy, Object, PartyMember, SelfTarget, Ally, NPC };
+    public enum ValidTarget { Zero = 0, Corpse, Enemy, Object, PartyMember, SelfTarget, Player, Ally, NPC };
 
     public static class ValidTargetHelpers
     {
@@ -23,13 +23,14 @@
 
         public readonly static Dictionary<TARGETTYPE, ValidTarget> ValidTargetMap = new()
         {
-            { TARGETTYPE.TARGET_NONE, ValidTarget.Zero },
-            { TARGETTYPE.TARGET_SELF, ValidTarget.SelfTarget },
-            { TARGETTYPE.TARGET_PLAYER_PARTY, ValidTarget.PartyMember },
-            { TARGETTYPE.TARGET_ENEMY, ValidTarget.Enemy },
-            { TARGETTYPE.TARGET_PLAYER_ALLIANCE, ValidTarget.Ally },
-            { TARGETTYPE.TARGET_PLAYER_DEAD, ValidTarget.Corpse },
-            { TARGETTYPE.TARGET_NPC, ValidTarget.NPC },
+            { TARGETTYPE.TARGET_NONE,               ValidTarget.Zero },
+            { TARGETTYPE.TARGET_SELF,               ValidTarget.SelfTarget },
+            { TARGETTYPE.TARGET_PLAYER_PARTY,       ValidTarget.PartyMember },
+            { TARGETTYPE.TARGET_ENEMY,              ValidTarget.Enemy },
+            { TARGETTYPE.TARGET_PLAYER_ALLIANCE,    ValidTarget.Ally },
+            { TARGETTYPE.TARGET_PLAYER_DEAD,        ValidTarget.Corpse },
+            { TARGETTYPE.TARGET_NPC,                ValidTarget.NPC },
+            { TARGETTYPE.TARGET_PLAYER,             ValidTarget.Player },
         };
 
         public static bool IsEqual(List<ValidTarget> slotList, ushort dbValidTargets)
