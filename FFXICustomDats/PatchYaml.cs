@@ -1,4 +1,5 @@
-﻿using FFXICustomDats.YamlModels;
+﻿using FFXICustomDats.YamlConverters;
+using FFXICustomDats.YamlModels;
 using FFXICustomDats.YamlModels.DataMenu;
 using FFXICustomDats.YamlModels.Items;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
@@ -17,14 +18,14 @@ namespace FFXICustomDats
 
         public void PatchYamlFromXidb()
         {
-            UpdateYamlFromDB<ArmorItem>(@"items\armor.yml");
-            UpdateYamlFromDB<ArmorItem>(@"items\armor2.yml");
-            //UpdateYamlFromDB<FurnishingItem>(@"items\general_items.yml");
-            UpdateYamlFromDB<FurnishingItem>(@"items\general_items2.yml");
-            UpdateYamlFromDB<PuppetItem>(@"items\puppet_items.yml");
-            UpdateYamlFromDB<UsableItem>(@"items\usable_items.yml");
-            UpdateYamlFromDB<WeaponItem>(@"items\weapons.yml");
-            UpdateYamlFromDB(@"data_menu.yml");
+            UpdateItemYamlFromDB<ArmorItem>(@"items\armor.yml");
+            UpdateItemYamlFromDB<ArmorItem>(@"items\armor2.yml");
+            UpdateItemYamlFromDB<FurnishingItem>(@"items\general_items.yml");
+            UpdateItemYamlFromDB<FurnishingItem>(@"items\general_items2.yml");
+            UpdateItemYamlFromDB<PuppetItem>(@"items\puppet_items.yml");
+            UpdateItemYamlFromDB<UsableItem>(@"items\usable_items.yml");
+            UpdateItemYamlFromDB<WeaponItem>(@"items\weapons.yml");
+            UpdateDataMenuYamlFromDB(@"data_menu.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
@@ -32,14 +33,14 @@ namespace FFXICustomDats
 
         public void PatchYamlFromFiles()
         {
-            UpdateYamlFromFile<ArmorItem>(@"items\armor.yml", @"items\armor_patch.yml");
-            UpdateYamlFromFile<ArmorItem>(@"items\armor2.yml", @"items\armor2_patch.yml");
-            //UpdateYamlFromFile<FurnishingItem>(@"items\general_items.yml", @"items\general_items_patch.yml");
-            UpdateYamlFromFile<FurnishingItem>(@"items\general_items2.yml", @"items\general_items2_patch.yml");
-            UpdateYamlFromFile<PuppetItem>(@"items\puppet_items.yml", @"items\puppet_items_patch.yml");
-            UpdateYamlFromFile<UsableItem>(@"items\usable_items.yml", @"items\usable_items_patch.yml");
-            UpdateYamlFromFile<WeaponItem>(@"items\weapons.yml", @"items\weapons_patch.yml");
-            UpdateYamlFromFile(@"data_menu.yml", @"data_menu_patch.yml");
+            UpdateItemYamlFromFile<ArmorItem>(@"items\armor.yml", @"items\armor_patch.yml");
+            UpdateItemYamlFromFile<ArmorItem>(@"items\armor2.yml", @"items\armor2_patch.yml");
+            UpdateItemYamlFromFile<FurnishingItem>(@"items\general_items.yml", @"items\general_items_patch.yml");
+            UpdateItemYamlFromFile<FurnishingItem>(@"items\general_items2.yml", @"items\general_items2_patch.yml");
+            UpdateItemYamlFromFile<PuppetItem>(@"items\puppet_items.yml", @"items\puppet_items_patch.yml");
+            UpdateItemYamlFromFile<UsableItem>(@"items\usable_items.yml", @"items\usable_items_patch.yml");
+            UpdateItemYamlFromFile<WeaponItem>(@"items\weapons.yml", @"items\weapons_patch.yml");
+            UpdateDataMenuYamlFromFile(@"data_menu.yml", @"data_menu_patch.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
@@ -47,13 +48,18 @@ namespace FFXICustomDats
 
         public void ClearRawDataDir()
         {
+            foreach (DirectoryInfo directory in new DirectoryInfo(_rawData).EnumerateDirectories())
+            {
+                directory.Delete(true);
+            }
+
             foreach (FileInfo file in new DirectoryInfo(_rawData).EnumerateFiles())
             {
                 file.Delete();
             }
         }
 
-        private void UpdateYamlFromDB<T>(string fileName) where T : Item
+        private void UpdateItemYamlFromDB<T>(string fileName) where T : Item
         {
             Console.WriteLine($"Update Yaml from xidb {fileName}");
             var origFilePath = Path.Combine(_originalData, fileName);
@@ -66,7 +72,7 @@ namespace FFXICustomDats
             }
         }
 
-        private void UpdateYamlFromDB(string fileName)
+        private void UpdateDataMenuYamlFromDB(string fileName)
         {
             Console.WriteLine($"Update Yaml from xidb {fileName}");
             var origFilePath = Path.Combine(_originalData, fileName);
@@ -75,11 +81,11 @@ namespace FFXICustomDats
             var updateFilePath = Path.Exists(newFilePath) ? newFilePath : origFilePath;
             if (Path.Exists(updateFilePath))
             {
-                UpdateItemsFromDB(updateFilePath, newFilePath);
+                UpdateSpellsFromDB(updateFilePath, newFilePath);
             }
         }
 
-        public void UpdateYamlFromFile<T>(string fileName, string patchFile) where T : Item
+        public void UpdateItemYamlFromFile<T>(string fileName, string patchFile) where T : Item
         {
             Console.WriteLine($"Update Yaml from file {fileName}");
             var (updateFilePath, patchFilePath, newFilePath) = GetFilePaths(fileName, patchFile);
@@ -91,7 +97,7 @@ namespace FFXICustomDats
             }
         }
 
-        public void UpdateYamlFromFile(string fileName, string patchFile)
+        public void UpdateDataMenuYamlFromFile(string fileName, string patchFile)
         {
             Console.WriteLine($"Update Yaml from file {fileName}");
             var (updateFilePath, patchFilePath, newFilePath) = GetFilePaths(fileName, patchFile);
@@ -134,10 +140,10 @@ namespace FFXICustomDats
 
         private static void SerializeAndWriteFile(object thing, string filePath)
         {
-            var yamlString = SerializeToYaml(thing);
+            var yamlString = Helpers.SerializeToYaml(thing);
             if (!string.IsNullOrWhiteSpace(yamlString))
             {
-                WriteNewYamlFile(yamlString, filePath);
+                Helpers.WriteNewYamlFile(yamlString, filePath);
             }
         }
 
@@ -148,7 +154,7 @@ namespace FFXICustomDats
                 var item = items.Items.FirstOrDefault(x => x.Id == patchItem.Id);
                 if (item != null)
                 {
-                    DeepCopy(item, patchItem);
+                    Helpers.DeepCopy(item, patchItem);
                 }
             }
         }
@@ -164,45 +170,10 @@ namespace FFXICustomDats
                     var originalDM = originalEntries.EntryList.FirstOrDefault(x => x.Id == patchDM.Id);
                     if (originalDM != null)
                     {
-                        DeepCopy(originalDM, patchDM);
+                        Helpers.DeepCopy(originalDM, patchDM);
                     }
                 }
             }
-        }
-
-        private static void DeepCopy<T>(T original, T newItem) where T : class
-        {
-            foreach (var prop in original.GetType().GetProperties())
-            {
-                if (!(prop.GetValue(original) == prop.GetValue(newItem))
-                    && prop.GetValue(newItem) != (prop.GetType().IsValueType ? Activator.CreateInstance(prop.GetType()) : null))
-                {
-                    prop.SetValue(original, prop.GetValue(newItem));
-                }
-            }
-        }
-
-        private static String SerializeToYaml(object thing)
-        {
-            Console.WriteLine($"Serializing");
-
-            var serializer = new SerializerBuilder().Build();
-            return serializer.Serialize(thing);
-        }
-
-        private static void WriteNewYamlFile(string yaml, string filePath)
-        {
-            Console.WriteLine($"Writing file {filePath}");
-            if (!Path.Exists(filePath))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
-            }
-
-            using StreamWriter writetext = new(filePath);
-            writetext.Write(yaml);
-            writetext.Flush();
-            writetext.Close();
-            writetext.Dispose();
         }
 
         private void UpdateItemsFromDB<T>(string updateFilePath, string newFilePath) where T : Item
@@ -233,14 +204,14 @@ namespace FFXICustomDats
             SerializeAndWriteFile(items, newFilePath);
         }
 
-        private void UpdateItemsFromDB(string updateFilePath, string newFilePath)
+        private void UpdateSpellsFromDB(string updateFilePath, string newFilePath)
         {
             var misc = Helpers.DeserializeYaml(updateFilePath);
 
             var entries = misc.Sections.FirstOrDefault(x => x.Type == SectionType.Mgc_)?.Entries;
             if (entries != null)
             {
-                _patchDM.UpdateDataMenu(entries.EntryList);
+                _patchDM.UpdateSpells(entries.EntryList);
 
                 SerializeAndWriteFile(misc, newFilePath);
             } 

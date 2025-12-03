@@ -27,18 +27,54 @@ namespace FFXICustomDats
 
         private static (IDeserializer, StringReader) GetInputAndDeserializer(string filePath)
         {
-            var customerConverter = new EntriesTypeConverter();
             FileStream fileStream = new(filePath, FileMode.Open);
             using var reader = new StreamReader(fileStream);
 
             return (
                 new DeserializerBuilder()
-                    .WithTypeConverter(customerConverter)
+                    .WithTypeConverter(new EntriesTypeConverter())
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                     .IgnoreUnmatchedProperties()
                     .Build(),
                 new StringReader(reader.ReadToEnd())
             );
+        }
+
+        public static String SerializeToYaml(object thing)
+        {
+            Console.WriteLine($"Serializing");
+
+            var serializer = new SerializerBuilder()
+                .WithTypeConverter(new EntriesTypeConverter())
+                .Build();
+            return serializer.Serialize(thing);
+        }
+
+        public static void WriteNewYamlFile(string yaml, string filePath)
+        {
+            Console.WriteLine($"Writing file {filePath}");
+            if (!Path.Exists(filePath))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
+            }
+
+            using StreamWriter writetext = new(filePath);
+            writetext.Write(yaml);
+            writetext.Flush();
+            writetext.Close();
+            writetext.Dispose();
+        }
+
+        public static void DeepCopy<T>(T original, T newItem) where T : class
+        {
+            foreach (var prop in original.GetType().GetProperties())
+            {
+                if (!(prop.GetValue(original) == prop.GetValue(newItem))
+                    && prop.GetValue(newItem) != (prop.GetType().IsValueType ? Activator.CreateInstance(prop.GetType()) : null))
+                {
+                    prop.SetValue(original, prop.GetValue(newItem));
+                }
+            }
         }
 
         public static List<T> BitsToEnumList<T>(ushort bits) where T : Enum
@@ -129,7 +165,14 @@ namespace FFXICustomDats
 
         public static List<T> DBValueToYamlList<dbT, T>(Dictionary<dbT, T> enumMap, ushort dbValue) where T : Enum where dbT : Enum
         {
-            return [.. Helpers.BitsToEnumList<dbT>(dbValue).Select(x => enumMap.TryGetValue(x, out var value) ? value : (T)Enum.Parse(typeof(T), 0.ToString())).Distinct()];
+            List<T> yamlList = [.. Helpers.BitsToEnumList<dbT>(dbValue).Select(x => enumMap.TryGetValue(x, out var value) ? value : (T)Enum.Parse(typeof(T), 0.ToString())).Distinct()];
+
+            if (Enum.IsDefined(typeof(T), "Zero") && Enum.TryParse(typeof(T), "Zero", out var zeroEnum))
+            {
+                yamlList.RemoveAll(x => x.Equals((T)zeroEnum));
+            }
+                
+            return yamlList;
         }
 
         public static uint YamlListToDBValue<T, dbT>(Dictionary<T, dbT> enumMap, IEnumerable<T> yamlList) where T : Enum where dbT : Enum

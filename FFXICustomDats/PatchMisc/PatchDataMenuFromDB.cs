@@ -16,7 +16,7 @@ namespace FFXICustomDats
         private readonly XidbContext _context = context;
         private readonly IConfiguration _config = config;
 
-        public void UpdateDataMenu(List<Entry> entries)
+        public void UpdateSpells(List<Entry> entries)
         {
             var spellIds = entries.Select(i => i.Index);
             var spellList = _context.SpellLists.Where(x => spellIds.Contains(x.Spellid)).ToList();
@@ -53,19 +53,19 @@ namespace FFXICustomDats
                 spell.SkillType = SkillTypeHelpers.SkillTypeMap.GetValueOrDefault((SKILL_TYPE)dbSpell.Skill);
             }
 
-            if (spell.MpCost != dbSpell.MpCost)
+            if (spell.MpCost != dbSpell.MpCost && spell.MagicType != MagicType.Ninjutsu)
             {
                 spell.MpCost = dbSpell.MpCost;
             }
 
-            if (spell.CastTime != (dbSpell.CastTime / 1000))
+            if (spell.CastTime != (dbSpell.CastTime * 4 / 1000))
             {
-                spell.CastTime = (dbSpell.CastTime / 1000);
+                spell.CastTime = (dbSpell.CastTime * 4 / 1000);
             }
 
-            if (spell.RecastTime != (dbSpell.RecastTime / 1000))
+            if (spell.RecastTime != (dbSpell.RecastTime * 4 / 1000))
             {
-                spell.RecastTime = (dbSpell.RecastTime / 1000);
+                spell.RecastTime = (dbSpell.RecastTime * 4 / 1000);
             }
 
             if (JobHelpers.IsEqual(spell.LevelRequired, dbSpell.Jobs))

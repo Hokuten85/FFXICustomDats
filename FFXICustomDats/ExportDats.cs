@@ -13,7 +13,7 @@ namespace FFXICustomDats
         {
             ExportDatToYaml(@"ROM\118\109.dat", @"items\armor.yml");
             ExportDatToYaml(@"ROM\286\73.dat",  @"items\armor2.yml");
-            //ExportDatToYaml(@"ROM\118\106.DAT", @"items\general_items.yml");
+            ExportDatToYaml(@"ROM\118\106.DAT", @"items\general_items.yml");
             ExportDatToYaml(@"ROM\301\115.dat", @"items\general_items2.yml");
             ExportDatToYaml(@"ROM\118\110.dat", @"items\puppet_items.yml");
             ExportDatToYaml(@"ROM\118\107.dat", @"items\usable_items.yml");

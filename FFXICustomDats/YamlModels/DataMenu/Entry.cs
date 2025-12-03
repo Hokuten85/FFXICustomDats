@@ -40,18 +40,18 @@ namespace FFXICustomDats.YamlModels.DataMenu
         public long IconId { get; set; }
 
         [YamlMember(Alias = "unknowns", ApplyNamingConventions = false)]
-        public Unknowns Unknowns { get; set; }
+        public string Unknowns { get; set; }
 
-        [YamlMember(Alias = "ability_type", ApplyNamingConventions = false)]
+        [YamlMember(Alias = "ability_type", ApplyNamingConventions = false, DefaultValuesHandling = DefaultValuesHandling.OmitNull)]
         public AbilityType? AbilityType { get; set; }
 
-        [YamlMember(Alias = "unknown1", ApplyNamingConventions = false)]
+        [YamlMember(Alias = "unknown1", ApplyNamingConventions = false, DefaultValuesHandling = DefaultValuesHandling.OmitNull)]
         public long? Unknown1 { get; set; }
 
-        [YamlMember(Alias = "shared_timer_id", ApplyNamingConventions = false)]
+        [YamlMember(Alias = "shared_timer_id", ApplyNamingConventions = false, DefaultValuesHandling = DefaultValuesHandling.OmitNull)]
         public long? SharedTimerId { get; set; }
 
-        [YamlMember(Alias = "tp_cost", ApplyNamingConventions = false)]
+        [YamlMember(Alias = "tp_cost", ApplyNamingConventions = false, DefaultValuesHandling = DefaultValuesHandling.OmitNull)]
         public long? TpCost { get; set; }
     }
 
