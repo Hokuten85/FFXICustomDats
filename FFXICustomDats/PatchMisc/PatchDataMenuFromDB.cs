@@ -18,12 +18,12 @@ namespace FFXICustomDats
 
         public void UpdateDataMenu(List<Entry> entries)
         {
-            var spellIds = entries.Select(i => i.Id);
+            var spellIds = entries.Select(i => i.Index);
             var spellList = _context.SpellLists.Where(x => spellIds.Contains(x.Spellid)).ToList();
 
             foreach (var spell in entries)
             {
-                var dbSpell = spellList.FirstOrDefault(x => x.Spellid == spell.Id);
+                var dbSpell = spellList.FirstOrDefault(x => x.Spellid == spell.Index);
                 if (dbSpell != null)
                 {
                     UpdateSpell(spell, dbSpell);
@@ -58,19 +58,19 @@ namespace FFXICustomDats
                 spell.MpCost = dbSpell.MpCost;
             }
 
-            if (spell.CastTime != dbSpell.CastTime)
+            if (spell.CastTime != (dbSpell.CastTime / 1000))
             {
-                spell.CastTime = dbSpell.CastTime;
+                spell.CastTime = (dbSpell.CastTime / 1000);
             }
 
-            if (spell.RecastTime != dbSpell.RecastTime)
+            if (spell.RecastTime != (dbSpell.RecastTime / 1000))
             {
-                spell.RecastTime = dbSpell.RecastTime;
+                spell.RecastTime = (dbSpell.RecastTime / 1000);
             }
 
-            if (spell.LevelRequired != dbSpell.Jobs)
+            if (JobHelpers.IsEqual(spell.LevelRequired, dbSpell.Jobs))
             {
-                spell.LevelRequired = dbSpell.Jobs;
+                spell.LevelRequired = JobHelpers.DBByteArrayToYamlEnumDict(dbSpell.Jobs);
             }
         }
     }

@@ -97,6 +97,12 @@
             return Helpers.AreEqual(jobList, dbList);
         }
 
+        public static bool IsEqual(Dictionary<Job, long> yamlJobDict, byte[] dbJobs)
+        {
+            var dbDict = DBByteArrayToYamlEnumDict(dbJobs);
+            return Helpers.AreEqual(yamlJobDict, dbDict);
+        }
+
         public static List<JOBTYPE> JobTypeBitsToEnumList(uint bits)
         {
             var enumList = new List<JOBTYPE>();
@@ -130,6 +136,23 @@
                 return (uint)JOBTYPE.JOB_ALL;
             }
             return Helpers.YamlListToDBValue(ReverseJobMap(), jobList.Where(x => x != Job.All));
+        }
+
+        public static Dictionary<Job, long> DBByteArrayToYamlEnumDict(byte[] jobs)
+        {
+            return jobs.Select((level, index) => new 
+                        { 
+                            Job = (JOBTYPE)(index + 1),
+                            Level = level
+                        })
+                        .Where(x => x.Level > 0x00)
+                        .Select(x => new
+                        {
+                            Job = JobMap.TryGetValue(x.Job, out var job) ? job : Job.Zero,
+                            Level = (long)x.Level
+                        })
+                        .Where(x => x.Job != Job.Zero)
+                        .ToDictionary(x => x.Job, y => y.Level);
         }
     }
 }

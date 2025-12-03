@@ -114,6 +114,19 @@ namespace FFXICustomDats
             return list1.All(list2.Contains) && list1.Count == list2.Count;
         }
 
+        public static bool AreEqual<TKey, TValue>(Dictionary<TKey, TValue> dict1, Dictionary<TKey, TValue> dict2) where TKey : notnull where TValue : IEquatable<TValue>
+        {
+            if (dict1.Count != dict2.Count) return false;
+            foreach (var kvp in dict1)
+            {
+                if (!dict2.TryGetValue(kvp.Key, out var value) || !value.Equals(kvp.Value))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static List<T> DBValueToYamlList<dbT, T>(Dictionary<dbT, T> enumMap, ushort dbValue) where T : Enum where dbT : Enum
         {
             return [.. Helpers.BitsToEnumList<dbT>(dbValue).Select(x => enumMap.TryGetValue(x, out var value) ? value : (T)Enum.Parse(typeof(T), 0.ToString())).Distinct()];

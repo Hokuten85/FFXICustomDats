@@ -19,6 +19,7 @@ builder.Services.AddTransient<PatchItemsFromDB>();
 builder.Services.AddTransient<WriteDats>();
 builder.Services.AddTransient<PatchDB>();
 builder.Services.AddTransient<PatchDBFromItems>();
+builder.Services.AddTransient<PatchDataMenuFromDB>();
 var host = builder.Build();
 
 var app = host.Services.GetRequiredService<CustomDats>();

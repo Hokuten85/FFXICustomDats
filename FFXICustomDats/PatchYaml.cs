@@ -7,9 +7,10 @@ using YamlDotNet.Serialization;
 
 namespace FFXICustomDats
 {
-    public class PatchYaml(IConfiguration config, PatchItemsFromDB patch)
+    public class PatchYaml(IConfiguration config, PatchItemsFromDB patch, PatchDataMenuFromDB patchDM)
     {
         private readonly PatchItemsFromDB _patch = patch;
+        private readonly PatchDataMenuFromDB _patchDM = patchDM;
         private readonly string _rawData = config.GetValue<string>("RawData") ?? string.Empty;
         private readonly string _originalData = config.GetValue<string>("OriginalData") ?? string.Empty;
         private readonly string _yamlPatches = config.GetValue<string>("YamlPatches") ?? string.Empty;
@@ -18,7 +19,7 @@ namespace FFXICustomDats
         {
             UpdateYamlFromDB<ArmorItem>(@"items\armor.yml");
             UpdateYamlFromDB<ArmorItem>(@"items\armor2.yml");
-            UpdateYamlFromDB<FurnishingItem>(@"items\general_items.yml");
+            //UpdateYamlFromDB<FurnishingItem>(@"items\general_items.yml");
             UpdateYamlFromDB<FurnishingItem>(@"items\general_items2.yml");
             UpdateYamlFromDB<PuppetItem>(@"items\puppet_items.yml");
             UpdateYamlFromDB<UsableItem>(@"items\usable_items.yml");
@@ -33,7 +34,7 @@ namespace FFXICustomDats
         {
             UpdateYamlFromFile<ArmorItem>(@"items\armor.yml", @"items\armor_patch.yml");
             UpdateYamlFromFile<ArmorItem>(@"items\armor2.yml", @"items\armor2_patch.yml");
-            UpdateYamlFromFile<FurnishingItem>(@"items\general_items.yml", @"items\general_items_patch.yml");
+            //UpdateYamlFromFile<FurnishingItem>(@"items\general_items.yml", @"items\general_items_patch.yml");
             UpdateYamlFromFile<FurnishingItem>(@"items\general_items2.yml", @"items\general_items2_patch.yml");
             UpdateYamlFromFile<PuppetItem>(@"items\puppet_items.yml", @"items\puppet_items_patch.yml");
             UpdateYamlFromFile<UsableItem>(@"items\usable_items.yml", @"items\usable_items_patch.yml");
@@ -236,7 +237,13 @@ namespace FFXICustomDats
         {
             var misc = Helpers.DeserializeYaml(updateFilePath);
 
-            SerializeAndWriteFile(misc, newFilePath);
+            var entries = misc.Sections.FirstOrDefault(x => x.Type == SectionType.Mgc_)?.Entries;
+            if (entries != null)
+            {
+                _patchDM.UpdateDataMenu(entries.EntryList);
+
+                SerializeAndWriteFile(misc, newFilePath);
+            } 
         }
     }
 }
