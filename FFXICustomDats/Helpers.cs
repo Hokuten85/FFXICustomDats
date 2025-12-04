@@ -1,9 +1,11 @@
 ﻿using FFXICustomDats.YamlConverters;
 using FFXICustomDats.YamlModels;
+using FFXICustomDats.YamlModels.DataMenu;
 using FFXICustomDats.YamlModels.Items;
 using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
 using FFXICustomDats.YamlModels.SharedAttributes;
+using System;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -33,6 +35,15 @@ namespace FFXICustomDats
             return (
                 new DeserializerBuilder()
                     .WithTypeConverter(new EntriesTypeConverter())
+                    .WithTypeDiscriminatingNodeDeserializer((o) =>
+                    {
+                        IDictionary<string, Type> keyMappings = new Dictionary<string, Type>
+                        {
+                            { "magic_type", typeof(Spell) },
+                            { "ability_type", typeof(Ability) }
+                        };
+                        o.AddUniqueKeyTypeDiscriminator<Entry>(keyMappings);
+                    })
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                     .IgnoreUnmatchedProperties()
                     .Build(),

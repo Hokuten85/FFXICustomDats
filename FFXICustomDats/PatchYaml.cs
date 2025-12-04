@@ -81,7 +81,7 @@ namespace FFXICustomDats
             var updateFilePath = Path.Exists(newFilePath) ? newFilePath : origFilePath;
             if (Path.Exists(updateFilePath))
             {
-                UpdateSpellsFromDB(updateFilePath, newFilePath);
+               UpdateDataMenuFromDB(updateFilePath, newFilePath);
             }
         }
 
@@ -165,9 +165,9 @@ namespace FFXICustomDats
             var originalEntries = dataMenu.Sections.FirstOrDefault(x => x.Type == SectionType.Mgc_)?.Entries;
             if (patchEntries != null && originalEntries != null)
             {
-                foreach (var patchDM in patchEntries.EntryList)
+                foreach (var patchDM in patchEntries.SpellList)
                 {
-                    var originalDM = originalEntries.EntryList.FirstOrDefault(x => x.Id == patchDM.Id);
+                    var originalDM = originalEntries.SpellList.FirstOrDefault(x => x.Id == patchDM.Id);
                     if (originalDM != null)
                     {
                         Helpers.DeepCopy(originalDM, patchDM);
@@ -204,17 +204,17 @@ namespace FFXICustomDats
             SerializeAndWriteFile(items, newFilePath);
         }
 
-        private void UpdateSpellsFromDB(string updateFilePath, string newFilePath)
+        private void UpdateDataMenuFromDB(string updateFilePath, string newFilePath)
         {
             var misc = Helpers.DeserializeYaml(updateFilePath);
 
             var entries = misc.Sections.FirstOrDefault(x => x.Type == SectionType.Mgc_)?.Entries;
             if (entries != null)
             {
-                _patchDM.UpdateSpells(entries.EntryList);
+                _patchDM.UpdateSpells(entries.SpellList);
+            }
 
-                SerializeAndWriteFile(misc, newFilePath);
-            } 
+            SerializeAndWriteFile(misc, newFilePath);
         }
     }
 }

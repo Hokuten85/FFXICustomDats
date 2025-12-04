@@ -6,8 +6,10 @@ using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
 using FFXICustomDats.YamlModels.SharedAttributes;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 using static FFXICustomDats.YamlModels.DataMenu.Attributes.MagicTypeHelpers;
 using static FFXICustomDats.YamlModels.SharedAttributes.SkillTypeHelpers;
+using Ability = FFXICustomDats.YamlModels.DataMenu.Ability;
 
 namespace FFXICustomDats
 {
@@ -16,7 +18,7 @@ namespace FFXICustomDats
         private readonly XidbContext _context = context;
         private readonly IConfiguration _config = config;
 
-        public void UpdateSpells(List<Entry> entries)
+        public void UpdateSpells(List<Spell> entries)
         {
             var spellIds = entries.Select(i => i.Index);
             var spellList = _context.SpellLists.Where(x => spellIds.Contains(x.Spellid)).ToList();
@@ -31,9 +33,9 @@ namespace FFXICustomDats
             }
         }
 
-        private static void UpdateSpell(Entry spell, SpellList dbSpell)
+        private static void UpdateSpell(Spell spell, SpellList dbSpell)
         {
-            if (!MagicTypeHelpers.IsEqual(spell.MagicType, dbSpell.Group))
+            if (!MagicTypeHelpers.IsEqual(spell.MagicType.Value, dbSpell.Group))
             {
                 spell.MagicType = MagicTypeHelpers.MagicTypeMap.GetValueOrDefault((SPELLGROUP)dbSpell.Group);
             }

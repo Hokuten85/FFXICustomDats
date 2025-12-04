@@ -27,10 +27,18 @@ namespace FFXICustomDats.YamlConverters
 
             while (!parser.Accept<SequenceEnd>(out _))
             {
+
                 var entry = rootDeserializer.Invoke(typeof(Entry));
                 if (entry != null)
                 {
-                    entries.EntryList.Add((Entry)entry);
+                    if (entry.GetType() == typeof(Ability))
+                    {
+                        entries.AbilityList.Add((Ability)entry);
+                    }
+                    else if (entry.GetType() == typeof(Spell))
+                    {
+                        entries.SpellList.Add((Spell)entry);
+                    }
                 }
             }
             // Consume the mapping end token
@@ -69,15 +77,28 @@ namespace FFXICustomDats.YamlConverters
             {
                 emitter.Emit(new Scalar(AnchorName.Empty, TagName.Empty, (value as Entries)?.String ?? string.Empty, ScalarStyle.Plain, isPlainImplicit: true, isQuotedImplicit: false));
             }
-            else if ((value as Entries)?.EntryList?.Count > 0)
+            else if ((value as Entries)?.SpellList?.Count > 0)
             {
                 emitter.Emit(new SequenceStart(AnchorName.Empty, TagName.Empty, isImplicit: true, SequenceStyle.Block));
 
-                var entryList = (value as Entries)?.EntryList ?? [];
+                var spellList = (value as Entries)?.SpellList ?? [];
 
-                foreach (var entry in entryList)
+                foreach (var entry in spellList)
                 {
                     serializer.Invoke(entry);
+                }
+
+                emitter.Emit(new SequenceEnd());
+            }
+            else if (((value as Entries)?.AbilityList?.Count > 0))
+            {
+                emitter.Emit(new SequenceStart(AnchorName.Empty, TagName.Empty, isImplicit: true, SequenceStyle.Block));
+
+                var abilityList = (value as Entries)?.AbilityList ?? [];
+
+                foreach (var ability in abilityList)
+                {
+                    serializer.Invoke(ability);
                 }
 
                 emitter.Emit(new SequenceEnd());
