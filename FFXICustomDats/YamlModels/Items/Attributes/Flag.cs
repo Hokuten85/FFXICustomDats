@@ -44,7 +44,7 @@
             ITEM_FLAG_RARE,
         };
 
-        public static readonly Dictionary<ITEM_FLAG, Flag> FlagMap = new()
+        public static readonly Dictionary<ITEM_FLAG, Flag> Map = new()
         {
             { ITEM_FLAG.Zero,                   Flag.Zero },
             { ITEM_FLAG.ITEM_FLAG_WALLHANGING,  Flag.WallHanging },
@@ -65,16 +65,16 @@
             { ITEM_FLAG.ITEM_FLAG_RARE,         Flag.Rare }
         };
 
-        public static Dictionary<Flag, ITEM_FLAG> ReverseFlagMap()
+        public static Dictionary<Flag, ITEM_FLAG> RMap()
         {
-            var reverseMap = FlagMap.ToDictionary(x => x.Value, y => y.Key);
+            var reverseMap = Map.ToDictionary(x => x.Value, y => y.Key);
             reverseMap.Add(Flag.NoTradePC, ITEM_FLAG.ITEM_FLAG_EX);
             return reverseMap;
         }
 
         public static bool IsEqual(List<Flag> flagList, ushort dbFlags)
         {
-            var dbList = Helpers.DBValueToYamlList(FlagMap, dbFlags);
+            var dbList = Helpers.DBValueToYamlList(Map, dbFlags);
 
             return Helpers.AreEqual(flagList, dbList);
         }

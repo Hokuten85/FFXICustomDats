@@ -1,4 +1,6 @@
-﻿namespace FFXICustomDats.YamlModels.SharedAttributes
+﻿using static FFXICustomDats.YamlModels.SharedAttributes.SkillTypeHelpers;
+
+namespace FFXICustomDats.YamlModels.SharedAttributes
 {
     public enum ValidTarget { Zero = 0, Corpse, Enemy, Object, PartyMember, SelfTarget, Player, Ally, NPC };
 
@@ -21,7 +23,7 @@
             TARGET_ANY_ALLEGIANCE,
         };
 
-        public readonly static Dictionary<TARGETTYPE, ValidTarget> ValidTargetMap = new()
+        public readonly static Dictionary<TARGETTYPE, ValidTarget> Map = new()
         {
             { TARGETTYPE.TARGET_NONE,               ValidTarget.Zero },
             { TARGETTYPE.TARGET_SELF,               ValidTarget.SelfTarget },
@@ -33,9 +35,14 @@
             { TARGETTYPE.TARGET_PLAYER,             ValidTarget.Player },
         };
 
+        public static Dictionary<ValidTarget, TARGETTYPE> RMap()
+        {
+            return Map.ToDictionary(x => x.Value, y => y.Key);
+        }
+
         public static bool IsEqual(List<ValidTarget> slotList, ushort dbValidTargets)
         {
-            var dbList = Helpers.DBValueToYamlList(ValidTargetMap, dbValidTargets);
+            var dbList = Helpers.DBValueToYamlList(Map, dbValidTargets);
             return Helpers.AreEqual(slotList, dbList);
         }
     }

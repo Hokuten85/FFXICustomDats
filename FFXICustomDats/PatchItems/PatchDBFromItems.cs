@@ -162,7 +162,7 @@ namespace FFXICustomDats.PatchItems
 
                 if (!SkillTypeHelpers.IsEqual(item.Weapon.SkillType, weapon.Skill))
                 {
-                    weapon.Skill = (byte)(SkillTypeHelpers.ReverseSkillTypeMap().TryGetValue(item.Weapon.SkillType, out var skillType) ? skillType : 0);
+                    weapon.Skill = (byte)(SkillTypeHelpers.RMap().TryGetValue(item.Weapon.SkillType, out var skillType) ? skillType : 0);
                 }
 
                 _context.ItemWeapons.Update(weapon);
@@ -352,7 +352,7 @@ namespace FFXICustomDats.PatchItems
             {
                 if (!FlagHelpers.IsEqual(item.Flags, itemBasic.Flags))
                 {
-                    itemBasic.Flags = (ushort)Helpers.YamlListToDBValue(FlagHelpers.ReverseFlagMap(), item.Flags);
+                    itemBasic.Flags = (ushort)Helpers.YamlListToDBValue(FlagHelpers.RMap(), item.Flags);
                 }
 
                 if (item.StackSize != itemBasic.StackSize)

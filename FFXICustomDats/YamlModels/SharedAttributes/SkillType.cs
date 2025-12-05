@@ -110,7 +110,7 @@ namespace FFXICustomDats.YamlModels.SharedAttributes
             SKILL_SPECIAL = 255,
         };
 
-        public readonly static Dictionary<SKILL_TYPE, SkillType> SkillTypeMap = new()
+        public readonly static Dictionary<SKILL_TYPE, SkillType> Map = new()
         {
             { SKILL_TYPE.SKILL_AXE,                 SkillType.Axe },
             { SKILL_TYPE.SKILL_CLUB,                SkillType.Club },
@@ -143,17 +143,16 @@ namespace FFXICustomDats.YamlModels.SharedAttributes
             { SKILL_TYPE.SKILL_NINJUTSU,            SkillType.Ninjutsu },
             { SKILL_TYPE.SKILL_SINGING,             SkillType.Singing },
             { SKILL_TYPE.SKILL_SUMMONING_MAGIC,     SkillType.SummoningMagic },
-    
         };
 
-        public static Dictionary<SkillType, SKILL_TYPE> ReverseSkillTypeMap()
+        public static Dictionary<SkillType, SKILL_TYPE> RMap()
         {
-            return SkillTypeMap.ToDictionary(x => x.Value, y => y.Key);
+            return Map.ToDictionary(x => x.Value, y => y.Key);
         }
 
         public static bool IsEqual(SkillType yamlSkill, ushort dbSkill)
         {
-            return SkillTypeMap.TryGetValue((SKILL_TYPE)dbSkill, out var skillType) && skillType == yamlSkill;
+            return Map.TryGetValue((SKILL_TYPE)dbSkill, out var skillType) && skillType == yamlSkill;
         }
     }
 }

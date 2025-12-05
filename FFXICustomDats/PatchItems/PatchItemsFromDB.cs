@@ -156,7 +156,7 @@ namespace FFXICustomDats
 
                 if (!SkillTypeHelpers.IsEqual(item.Weapon.SkillType, weapon.Skill))
                 {
-                    item.Weapon.SkillType = SkillTypeHelpers.SkillTypeMap.GetValueOrDefault((SkillTypeHelpers.SKILL_TYPE)weapon.Skill);
+                    item.Weapon.SkillType = SkillTypeHelpers.Map.GetValueOrDefault((SkillTypeHelpers.SKILL_TYPE)weapon.Skill);
 
                 }
             }
@@ -292,7 +292,7 @@ namespace FFXICustomDats
 
                 if (!SlotHelpers.IsEqual(item.Equipment.Slots, equipment.Slot))
                 {
-                    item.Equipment.Slots = Helpers.DBValueToYamlList(SlotHelpers.SlotMap, equipment.Slot);
+                    item.Equipment.Slots = Helpers.DBValueToYamlList(SlotHelpers.Map, equipment.Slot);
                 }
 
                 if (!JobHelpers.IsEqual(item.Equipment.Jobs, equipment.Jobs))
@@ -323,7 +323,7 @@ namespace FFXICustomDats
             {
                 if (!FlagHelpers.IsEqual(item.Flags, itemBasic.Flags))
                 {
-                    item.Flags = Helpers.DBValueToYamlList(FlagHelpers.FlagMap, itemBasic.Flags);
+                    item.Flags = Helpers.DBValueToYamlList(FlagHelpers.Map, itemBasic.Flags);
                 }
 
                 if (item.StackSize != itemBasic.StackSize)

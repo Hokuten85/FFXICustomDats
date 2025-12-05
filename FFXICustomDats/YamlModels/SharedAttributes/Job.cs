@@ -59,7 +59,7 @@
             JOB_ALL = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 | 0x800 | 0x1000 | 0x2000 | 0x4000 | 0x8000 | 0x10000 | 0x20000 | 0x40000 | 0x80000 | 0x100000 | 0x200000
         };
 
-        public readonly static Dictionary<JOBTYPE, Job> JobMap = new()
+        public readonly static Dictionary<JOBTYPE, Job> Map = new()
         {
             { JOBTYPE.JOB_WAR, Job.WAR },
             { JOBTYPE.JOB_MNK, Job.MNK },
@@ -86,9 +86,9 @@
             { JOBTYPE.JOB_ALL, Job.All },
         };
 
-        public static Dictionary<Job, JOBTYPE> ReverseJobMap()
+        public static Dictionary<Job, JOBTYPE> RMap()
         {
-            return JobMap.ToDictionary(x => x.Value, y => y.Key);
+            return Map.ToDictionary(x => x.Value, y => y.Key);
         }
 
         public static bool IsEqual(List<Job> jobList, uint dbJobs)
@@ -99,7 +99,7 @@
 
         public static bool IsEqual(Dictionary<Job, long> yamlJobDict, byte[] dbJobs)
         {
-            var dbDict = DBByteArrayToYamlEnumDict(dbJobs);
+            var dbDict = DBByteArrayToYamlDict(dbJobs);
             return Helpers.AreEqual(yamlJobDict, dbDict);
         }
 
@@ -126,7 +126,7 @@
 
         public static List<Job> DBValueToYamlList(uint dbValue)
         {
-            return [.. JobTypeBitsToEnumList(dbValue).Select(x => JobMap.TryGetValue(x, out var value) ? value : Job.Zero).Distinct()];
+            return [.. JobTypeBitsToEnumList(dbValue).Select(x => Map.TryGetValue(x, out var value) ? value : Job.Zero).Distinct()];
         }
 
         public static uint YamlListToDBValue(List<Job> jobList)
@@ -135,10 +135,10 @@
             {
                 return (uint)JOBTYPE.JOB_ALL;
             }
-            return Helpers.YamlListToDBValue(ReverseJobMap(), jobList.Where(x => x != Job.All));
+            return Helpers.YamlListToDBValue(RMap(), jobList.Where(x => x != Job.All));
         }
 
-        public static Dictionary<Job, long> DBByteArrayToYamlEnumDict(byte[] jobs)
+        public static Dictionary<Job, long> DBByteArrayToYamlDict(byte[] jobs)
         {
             return jobs.Select((level, index) => new 
                         { 
@@ -148,11 +148,22 @@
                         .Where(x => x.Level > 0x00)
                         .Select(x => new
                         {
-                            Job = JobMap.TryGetValue(x.Job, out var job) ? job : Job.Zero,
+                            Job = Map.TryGetValue(x.Job, out var job) ? job : Job.Zero,
                             Level = (long)x.Level
                         })
                         .Where(x => x.Job != Job.Zero)
                         .ToDictionary(x => x.Job, y => y.Level);
+        }
+
+        public static byte[] YamlDictToDBByteArray(Dictionary<Job, long> jobs)
+        {
+            byte[] jobArray = new byte[22];
+            foreach (var job in jobs)
+            {
+                jobArray.SetValue((byte)job.Value, (int)job.Key-1);
+            }
+            
+            return jobArray;
         }
     }
 }

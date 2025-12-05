@@ -118,39 +118,6 @@ namespace FFXICustomDats
             return enumList;
         }
 
-        public static List<Job> JobBitsToEnumList(uint bits)
-        {
-            var enumList = new List<Job>();
-            if (bits == (uint)Job.All)
-            {
-                enumList.Add(Job.All);
-            }
-            else
-            {
-                foreach (var value in Enum.GetValues<Job>().Where(x => !x.Equals(Job.All)))
-                {
-                    if ((bits & 1 << (int)value - 1) > 0)
-                    {
-                        enumList.Add(value);
-                    }
-                }
-            }
-
-            return enumList;
-        }
-
-        public static ushort ConvertEnumListToBit<T>(List<T> enumList) where T : Enum
-        {
-            return (ushort)enumList.Aggregate(0, (total, next) => total | 1 << Convert.ToInt32(next) - 1);
-        }
-
-        public static ushort ConvertEnumListToBit(List<Job> jobList)
-        {
-            return (ushort)jobList.Aggregate(0, (total, next) =>
-                total | (next == Job.All ? (int)next : 1 << (int)next - 1)
-            );
-        }
-
         public static ushort ConvertEnumListToBit(List<Race> raceList)
         {
             return (ushort)raceList.Cast<int>().Aggregate(0, (total, next) => total | next);

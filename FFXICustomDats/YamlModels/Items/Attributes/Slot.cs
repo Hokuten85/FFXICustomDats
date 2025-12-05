@@ -30,7 +30,7 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
             SLOT_LINK2,
         };
 
-        public readonly static Dictionary<SLOTTYPE, Slot> SlotMap = new()
+        public readonly static Dictionary<SLOTTYPE, Slot> Map = new()
         {
             { SLOTTYPE.SLOT_MAIN, Slot.Main },
             { SLOTTYPE.SLOT_SUB, Slot.Sub },
@@ -50,14 +50,14 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
             { SLOTTYPE.SLOT_BACK, Slot.Back },
         };
 
-        public static Dictionary<Slot, SLOTTYPE> ReverseSlotMap()
+        public static Dictionary<Slot, SLOTTYPE> RMap()
         {
-            return SlotMap.Where(x => !(new[] { SLOTTYPE.SLOT_EAR2, SLOTTYPE.SLOT_RING2 }).Contains(x.Key)).ToDictionary(x => x.Value, y => y.Key);
+            return Map.Where(x => !(new[] { SLOTTYPE.SLOT_EAR2, SLOTTYPE.SLOT_RING2 }).Contains(x.Key)).ToDictionary(x => x.Value, y => y.Key);
         }
 
         public static ushort YamlListToDBValue(List<Slot> slotList)
         {
-            var dbValue = (ushort)Helpers.YamlListToDBValue(ReverseSlotMap(), slotList);
+            var dbValue = (ushort)Helpers.YamlListToDBValue(RMap(), slotList);
 
             if (slotList.Contains(Slot.Ears))
             {
@@ -74,7 +74,7 @@ namespace FFXICustomDats.YamlModels.Items.ItemAttributes
 
         public static bool IsEqual(List<Slot> slotList, ushort dbSlots)
         {
-            var dbList = Helpers.DBValueToYamlList(SlotMap, dbSlots);
+            var dbList = Helpers.DBValueToYamlList(Map, dbSlots);
             return Helpers.AreEqual(slotList, dbList);
         }
     }

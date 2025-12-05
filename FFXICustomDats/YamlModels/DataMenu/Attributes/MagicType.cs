@@ -33,7 +33,7 @@ namespace FFXICustomDats.YamlModels.DataMenu.Attributes
             SPELLGROUP_TRUST = 8
         };
 
-        public static readonly Dictionary<SPELLGROUP, MagicType> MagicTypeMap = new()
+        public static readonly Dictionary<SPELLGROUP, MagicType> Map = new()
         {
             { SPELLGROUP.SPELLGROUP_NONE,       MagicType.None },
             { SPELLGROUP.SPELLGROUP_WHITE,      MagicType.WhiteMagic },
@@ -46,14 +46,14 @@ namespace FFXICustomDats.YamlModels.DataMenu.Attributes
             { SPELLGROUP.SPELLGROUP_TRUST,      MagicType.TrustMagic },
         };
 
-        public static Dictionary<MagicType, SPELLGROUP> ReverseMagicTypeMap()
+        public static Dictionary<MagicType, SPELLGROUP> RMap()
         {
-            return MagicTypeMap.ToDictionary(x => x.Value, y => y.Key);
+            return Map.ToDictionary(x => x.Value, y => y.Key);
         }
 
         public static bool IsEqual(MagicType yamlMagicType, ushort dbSpellGroup)
         {
-            return MagicTypeMap.TryGetValue((SPELLGROUP)dbSpellGroup, out var magicType) && magicType == yamlMagicType;
+            return Map.TryGetValue((SPELLGROUP)dbSpellGroup, out var magicType) && magicType == yamlMagicType;
         }
     }
 }
