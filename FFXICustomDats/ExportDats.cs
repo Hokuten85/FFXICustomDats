@@ -12,13 +12,14 @@ namespace FFXICustomDats
         public void ExportDatToYaml()
         {
             ExportDatToYaml(@"ROM\118\109.dat", @"items\armor.yml");
-            ExportDatToYaml(@"ROM\286\73.dat",  @"items\armor2.yml");
-            ExportDatToYaml(@"ROM\118\106.DAT", @"items\general_items.yml");
+            ExportDatToYaml(@"ROM\286\73.dat", @"items\armor2.yml");
+            //ExportDatToYaml(@"ROM\118\106.DAT", @"items\general_items.yml");
             ExportDatToYaml(@"ROM\301\115.dat", @"items\general_items2.yml");
             ExportDatToYaml(@"ROM\118\110.dat", @"items\puppet_items.yml");
             ExportDatToYaml(@"ROM\118\107.dat", @"items\usable_items.yml");
             ExportDatToYaml(@"ROM\118\108.dat", @"items\weapons.yml");
             ExportDatToYaml(@"ROM\118\114.dat", @"data_menu.yml");
+            ExportDatToYaml(@"ROM\169\75.dat", @"merits.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();
