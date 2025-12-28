@@ -70,7 +70,7 @@ namespace FFXICustomDats
                 spell.RecastTime = (dbSpell.RecastTime * 4 / 1000);
             }
 
-            if (JobHelpers.IsEqual(spell.LevelRequired, dbSpell.Jobs))
+            if (!JobHelpers.IsEqual(spell.LevelRequired, dbSpell.Jobs))
             {
                 spell.LevelRequired = JobHelpers.DBByteArrayToYamlDict(dbSpell.Jobs);
             }
