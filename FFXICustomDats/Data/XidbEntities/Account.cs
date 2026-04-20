@@ -28,4 +28,6 @@ public partial class Account
     public byte Status { get; set; }
 
     public byte Priv { get; set; }
+
+    public virtual ICollection<AccountsTrustToken> AccountsTrustTokens { get; set; } = new List<AccountsTrustToken>();
 }

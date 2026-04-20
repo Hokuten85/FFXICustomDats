@@ -25,6 +25,8 @@ public partial class WeaponSkill
 
     public byte Aoe { get; set; }
 
+    public byte Radius { get; set; }
+
     public sbyte PrimarySc { get; set; }
 
     public sbyte SecondarySc { get; set; }

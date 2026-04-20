@@ -23,7 +23,7 @@ public partial class MobSkill
 
     public ushort MobValidTargets { get; set; }
 
-    public byte MobSkillFlag { get; set; }
+    public ushort MobSkillFlag { get; set; }
 
     public short MobSkillParam { get; set; }
 

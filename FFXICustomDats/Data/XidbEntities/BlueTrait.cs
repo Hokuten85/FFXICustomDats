@@ -14,4 +14,8 @@ public partial class BlueTrait
     public ushort Modifier { get; set; }
 
     public short Value { get; set; }
+
+    public byte Tier { get; set; }
+
+    public byte JobPointsOnly { get; set; }
 }

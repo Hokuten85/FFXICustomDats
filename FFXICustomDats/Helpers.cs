@@ -141,7 +141,7 @@ namespace FFXICustomDats
             return true;
         }
 
-        public static List<T> DBValueToYamlList<dbT, T>(Dictionary<dbT, T> enumMap, ushort dbValue) where T : Enum where dbT : Enum
+        public static List<T> DBValueToYamlList<dbT, T>(Dictionary<dbT, T> enumMap, uint dbValue) where T : Enum where dbT : Enum
         {
             List<T> yamlList = [.. Helpers.BitsToEnumList<dbT>(dbValue).Select(x => enumMap.TryGetValue(x, out var value) ? value : (T)Enum.Parse(typeof(T), 0.ToString())).Distinct()];
 

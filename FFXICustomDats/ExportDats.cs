@@ -19,7 +19,7 @@ namespace FFXICustomDats
             ExportDatToYaml(@"ROM\118\107.dat", @"items\usable_items.yml");
             ExportDatToYaml(@"ROM\118\108.dat", @"items\weapons.yml");
             ExportDatToYaml(@"ROM\118\114.dat", @"data_menu.yml");
-            ExportDatToYaml(@"ROM\169\75.dat", @"merits.yml");
+            //ExportDatToYaml(@"ROM\169\75.dat", @"merits.yml");
 
             Console.WriteLine("Press any key to return.");
             Console.ReadLine();

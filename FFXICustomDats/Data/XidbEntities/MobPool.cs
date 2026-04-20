@@ -56,4 +56,8 @@ public partial class MobPool
     public ushort SkillListId { get; set; }
 
     public ushort ResistId { get; set; }
+
+    public byte? ModelSize { get; set; }
+
+    public byte? ModelHitboxSize { get; set; }
 }

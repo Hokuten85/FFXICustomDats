@@ -243,7 +243,7 @@ namespace FFXICustomDats
             if (usable != null) {
                 if (item.Usable.ActivationTime != usable.Activation)
                 {
-                    item.Usable.ActivationTime = usable.Activation;
+                    item.Usable.ActivationTime = (int)usable.Activation;
                 }
             }
         }

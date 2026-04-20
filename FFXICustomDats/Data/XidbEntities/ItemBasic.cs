@@ -13,11 +13,13 @@ public partial class ItemBasic
 
     public string Sortname { get; set; } = null!;
 
+    public string NameJp { get; set; } = null!;
+
     public byte Type { get; set; }
 
     public byte StackSize { get; set; }
 
-    public ushort Flags { get; set; }
+    public uint Flags { get; set; }
 
     public byte AH { get; set; }
 

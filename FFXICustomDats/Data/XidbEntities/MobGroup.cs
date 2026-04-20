@@ -23,9 +23,7 @@ public partial class MobGroup
 
     public int Mp { get; set; }
 
-    public byte MinLevel { get; set; }
-
-    public byte MaxLevel { get; set; }
-
     public byte Allegiance { get; set; }
+
+    public string? ContentTag { get; set; }
 }

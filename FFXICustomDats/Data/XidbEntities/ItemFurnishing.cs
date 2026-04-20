@@ -16,4 +16,12 @@ public partial class ItemFurnishing
     public byte Element { get; set; }
 
     public byte Aura { get; set; }
+
+    public byte Placement { get; set; }
+
+    public byte SizeX { get; set; }
+
+    public byte SizeY { get; set; }
+
+    public ushort Height { get; set; }
 }

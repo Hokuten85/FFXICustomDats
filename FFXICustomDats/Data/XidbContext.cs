@@ -31,6 +31,10 @@ public partial class XidbContext : DbContext
 
     public virtual DbSet<AccountsSession> AccountsSessions { get; set; }
 
+    public virtual DbSet<AccountsTotp> AccountsTotps { get; set; }
+
+    public virtual DbSet<AccountsTrustToken> AccountsTrustTokens { get; set; }
+
     public virtual DbSet<AuctionHouse> AuctionHouses { get; set; }
 
     public virtual DbSet<AuctionHouseItem> AuctionHouseItems { get; set; }
@@ -163,6 +167,8 @@ public partial class XidbContext : DbContext
 
     public virtual DbSet<GuildShop> GuildShops { get; set; }
 
+    public virtual DbSet<HelpDesk> HelpDesks { get; set; }
+
     public virtual DbSet<InstanceEntity> InstanceEntities { get; set; }
 
     public virtual DbSet<InstanceList> InstanceLists { get; set; }
@@ -203,6 +209,8 @@ public partial class XidbContext : DbContext
 
     public virtual DbSet<MobGroup> MobGroups { get; set; }
 
+    public virtual DbSet<MobPet> MobPets { get; set; }
+
     public virtual DbSet<MobPool> MobPools { get; set; }
 
     public virtual DbSet<MobPoolMod> MobPoolMods { get; set; }
@@ -216,6 +224,8 @@ public partial class XidbContext : DbContext
     public virtual DbSet<MobSpawnPoint> MobSpawnPoints { get; set; }
 
     public virtual DbSet<MobSpawnSet> MobSpawnSets { get; set; }
+
+    public virtual DbSet<MobSpawnSlot> MobSpawnSlots { get; set; }
 
     public virtual DbSet<MobSpellList> MobSpellLists { get; set; }
 
@@ -266,6 +276,10 @@ public partial class XidbContext : DbContext
     public virtual DbSet<ZoneWeather> ZoneWeathers { get; set; }
 
     public virtual DbSet<Zoneline> Zonelines { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySql("data source=localhost;initial catalog=xidb;user id=root;password=Hokuten1", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.6.23-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -354,6 +368,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Name)
                 .HasColumnType("tinytext")
                 .HasColumnName("name");
+            entity.Property(e => e.Radius)
+                .HasColumnType("tinyint(2) unsigned")
+                .HasColumnName("radius");
             entity.Property(e => e.Range)
                 .HasColumnType("float(3,1) unsigned")
                 .HasColumnName("range");
@@ -565,6 +582,49 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.VersionMismatch)
                 .HasColumnType("tinyint(1) unsigned")
                 .HasColumnName("version_mismatch");
+        });
+
+        modelBuilder.Entity<AccountsTotp>(entity =>
+        {
+            entity.HasKey(e => e.Accid).HasName("PRIMARY");
+
+            entity.ToTable("accounts_totp");
+
+            entity.Property(e => e.Accid)
+                .ValueGeneratedNever()
+                .HasColumnType("int(10) unsigned")
+                .HasColumnName("accid");
+            entity.Property(e => e.RecoveryCode)
+                .HasMaxLength(32)
+                .HasColumnName("recovery_code");
+            entity.Property(e => e.Secret)
+                .HasMaxLength(32)
+                .HasColumnName("secret");
+            entity.Property(e => e.Validated).HasColumnName("validated");
+        });
+
+        modelBuilder.Entity<AccountsTrustToken>(entity =>
+        {
+            entity.HasKey(e => e.Token).HasName("PRIMARY");
+
+            entity.ToTable("accounts_trust_tokens");
+
+            entity.HasIndex(e => e.Accid, "idx_accid");
+
+            entity.Property(e => e.Token)
+                .HasMaxLength(64)
+                .IsFixedLength()
+                .HasColumnName("token");
+            entity.Property(e => e.Accid)
+                .HasColumnType("int(10) unsigned")
+                .HasColumnName("accid");
+            entity.Property(e => e.Expires)
+                .HasColumnType("datetime")
+                .HasColumnName("expires");
+
+            entity.HasOne(d => d.Acc).WithMany(p => p.AccountsTrustTokens)
+                .HasForeignKey(d => d.Accid)
+                .HasConstraintName("fk_trust_accid");
         });
 
         modelBuilder.Entity<AuctionHouse>(entity =>
@@ -1000,9 +1060,9 @@ public partial class XidbContext : DbContext
 
         modelBuilder.Entity<BlueTrait>(entity =>
         {
-            entity.HasKey(e => new { e.TraitCategory, e.TraitPointsNeeded, e.Modifier })
+            entity.HasKey(e => new { e.TraitCategory, e.TraitPointsNeeded, e.Modifier, e.Tier })
                 .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0, 0 });
 
             entity.ToTable("blue_traits");
 
@@ -1015,6 +1075,12 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Modifier)
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("modifier");
+            entity.Property(e => e.Tier)
+                .HasColumnType("tinyint(3) unsigned")
+                .HasColumnName("tier");
+            entity.Property(e => e.JobPointsOnly)
+                .HasColumnType("tinyint(1) unsigned")
+                .HasColumnName("job_points_only");
             entity.Property(e => e.Traitid)
                 .HasColumnType("tinyint(3) unsigned")
                 .HasColumnName("traitid");
@@ -2055,6 +2121,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.AlliedNotes)
                 .HasColumnType("int(10) unsigned")
                 .HasColumnName("allied_notes");
+            entity.Property(e => e.AlterEgoPoints)
+                .HasColumnType("smallint(5) unsigned")
+                .HasColumnName("alter_ego_points");
             entity.Property(e => e.AmanVouchers)
                 .HasColumnType("smallint(3) unsigned")
                 .HasColumnName("aman_vouchers");
@@ -2885,7 +2954,6 @@ public partial class XidbContext : DbContext
                 .HasColumnType("tinyint(2) unsigned")
                 .HasColumnName("safe");
             entity.Property(e => e.Satchel)
-                .HasDefaultValueSql("'30'")
                 .HasColumnType("tinyint(2) unsigned")
                 .HasColumnName("satchel");
             entity.Property(e => e.Wardrobe)
@@ -3844,6 +3912,38 @@ public partial class XidbContext : DbContext
                 .HasColumnName("min_price");
         });
 
+        modelBuilder.Entity<HelpDesk>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("help_desk");
+
+            entity.HasIndex(e => new { e.Charid, e.DeletedAt }, "idx_pending");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(10) unsigned")
+                .HasColumnName("id");
+            entity.Property(e => e.Charid)
+                .HasColumnType("int(10) unsigned")
+                .HasColumnName("charid");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("current_timestamp()")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DeletedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("deleted_at");
+            entity.Property(e => e.Message)
+                .HasMaxLength(1024)
+                .HasColumnName("message");
+            entity.Property(e => e.RespondedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("responded_at");
+            entity.Property(e => e.Response)
+                .HasMaxLength(1024)
+                .HasColumnName("response");
+        });
+
         modelBuilder.Entity<InstanceEntity>(entity =>
         {
             entity.HasKey(e => new { e.Instanceid, e.Id })
@@ -3944,11 +4044,14 @@ public partial class XidbContext : DbContext
                 .HasColumnName("aH");
             entity.Property(e => e.BaseSell).HasColumnType("int(10) unsigned");
             entity.Property(e => e.Flags)
-                .HasColumnType("smallint(5) unsigned")
+                .HasColumnType("int(10) unsigned")
                 .HasColumnName("flags");
             entity.Property(e => e.Name)
                 .HasColumnType("tinytext")
                 .HasColumnName("name");
+            entity.Property(e => e.NameJp)
+                .HasColumnType("tinytext")
+                .HasColumnName("name_jp");
             entity.Property(e => e.Sortname)
                 .HasColumnType("tinytext")
                 .HasColumnName("sortname");
@@ -4026,12 +4129,26 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Element)
                 .HasColumnType("tinyint(3) unsigned")
                 .HasColumnName("element");
+            entity.Property(e => e.Height)
+                .HasColumnType("smallint(4) unsigned")
+                .HasColumnName("height");
             entity.Property(e => e.Moghancement)
                 .HasColumnType("smallint(4) unsigned")
                 .HasColumnName("moghancement");
             entity.Property(e => e.Name)
                 .HasColumnType("text")
                 .HasColumnName("name");
+            entity.Property(e => e.Placement)
+                .HasColumnType("tinyint(3) unsigned")
+                .HasColumnName("placement");
+            entity.Property(e => e.SizeX)
+                .HasDefaultValueSql("'1'")
+                .HasColumnType("tinyint(3) unsigned")
+                .HasColumnName("size_x");
+            entity.Property(e => e.SizeY)
+                .HasDefaultValueSql("'1'")
+                .HasColumnType("tinyint(3) unsigned")
+                .HasColumnName("size_y");
             entity.Property(e => e.Storage)
                 .HasColumnType("tinyint(3) unsigned")
                 .HasColumnName("storage");
@@ -4135,7 +4252,7 @@ public partial class XidbContext : DbContext
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("itemid");
             entity.Property(e => e.Activation)
-                .HasColumnType("tinyint(3) unsigned")
+                .HasColumnType("float unsigned")
                 .HasColumnName("activation");
             entity.Property(e => e.Animation)
                 .HasColumnType("smallint(4) unsigned")
@@ -4434,10 +4551,6 @@ public partial class XidbContext : DbContext
                 .HasDefaultValueSql("'3'")
                 .HasColumnType("smallint(4) unsigned")
                 .HasColumnName("MND");
-            entity.Property(e => e.Mobradius)
-                .HasDefaultValueSql("'0.01'")
-                .HasColumnType("float(5,2) unsigned")
-                .HasColumnName("mobradius");
             entity.Property(e => e.Mp)
                 .HasDefaultValueSql("'100'")
                 .HasColumnType("tinyint(3) unsigned")
@@ -4479,6 +4592,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Allegiance)
                 .HasColumnType("tinyint(2) unsigned")
                 .HasColumnName("allegiance");
+            entity.Property(e => e.ContentTag)
+                .HasMaxLength(14)
+                .HasColumnName("content_tag");
             entity.Property(e => e.Dropid)
                 .HasColumnType("int(10) unsigned")
                 .HasColumnName("dropid");
@@ -4486,12 +4602,6 @@ public partial class XidbContext : DbContext
                 .HasDefaultValueSql("'0'")
                 .HasColumnType("mediumint(8)")
                 .HasColumnName("HP");
-            entity.Property(e => e.MaxLevel)
-                .HasColumnType("tinyint(2) unsigned")
-                .HasColumnName("maxLevel");
-            entity.Property(e => e.MinLevel)
-                .HasColumnType("tinyint(2) unsigned")
-                .HasColumnName("minLevel");
             entity.Property(e => e.Mp)
                 .HasDefaultValueSql("'0'")
                 .HasColumnType("mediumint(8)")
@@ -4508,6 +4618,32 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Spawntype)
                 .HasColumnType("tinyint(3) unsigned")
                 .HasColumnName("spawntype");
+        });
+
+        modelBuilder.Entity<MobPet>(entity =>
+        {
+            entity.HasKey(e => e.MobMobid).HasName("PRIMARY");
+
+            entity.ToTable("mob_pets");
+
+            entity.Property(e => e.MobMobid)
+                .ValueGeneratedNever()
+                .HasColumnType("int(10) unsigned")
+                .HasColumnName("mob_mobid");
+            entity.Property(e => e.Job)
+                .HasDefaultValueSql("'9'")
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("job");
+            entity.Property(e => e.Mobname)
+                .HasMaxLength(24)
+                .HasColumnName("mobname");
+            entity.Property(e => e.PetOffset)
+                .HasDefaultValueSql("'1'")
+                .HasColumnType("int(10) unsigned")
+                .HasColumnName("pet_offset");
+            entity.Property(e => e.Petname)
+                .HasMaxLength(24)
+                .HasColumnName("petname");
         });
 
         modelBuilder.Entity<MobPool>(entity =>
@@ -4564,12 +4700,18 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.MobType)
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("mobType");
+            entity.Property(e => e.ModelHitboxSize)
+                .HasColumnType("tinyint(1) unsigned")
+                .HasColumnName("modelHitboxSize");
+            entity.Property(e => e.ModelSize)
+                .HasColumnType("tinyint(1) unsigned")
+                .HasColumnName("modelSize");
             entity.Property(e => e.Modelid)
                 .HasMaxLength(20)
                 .IsFixedLength()
                 .HasColumnName("modelid");
             entity.Property(e => e.Name)
-                .HasMaxLength(24)
+                .HasMaxLength(32)
                 .HasColumnName("name");
             entity.Property(e => e.NamePrefix)
                 .HasColumnType("tinyint(4) unsigned")
@@ -4660,7 +4802,6 @@ public partial class XidbContext : DbContext
                 .HasColumnType("smallint(5)")
                 .HasColumnName("fire_sdt");
             entity.Property(e => e.H2hSdt)
-                .HasDefaultValueSql("'1'")
                 .HasColumnType("smallint(5)")
                 .HasColumnName("h2h_sdt");
             entity.Property(e => e.IceResRank)
@@ -4670,7 +4811,6 @@ public partial class XidbContext : DbContext
                 .HasColumnType("smallint(5)")
                 .HasColumnName("ice_sdt");
             entity.Property(e => e.ImpactSdt)
-                .HasDefaultValueSql("'1'")
                 .HasColumnType("smallint(5)")
                 .HasColumnName("impact_sdt");
             entity.Property(e => e.LightResRank)
@@ -4698,7 +4838,6 @@ public partial class XidbContext : DbContext
                 .HasColumnType("smallint(3)")
                 .HasColumnName("paralyze_res_rank");
             entity.Property(e => e.PierceSdt)
-                .HasDefaultValueSql("'1'")
                 .HasColumnType("smallint(5)")
                 .HasColumnName("pierce_sdt");
             entity.Property(e => e.PoisonResRank)
@@ -4708,7 +4847,6 @@ public partial class XidbContext : DbContext
                 .HasColumnType("smallint(3)")
                 .HasColumnName("silence_res_rank");
             entity.Property(e => e.SlashSdt)
-                .HasDefaultValueSql("'1'")
                 .HasColumnType("smallint(5)")
                 .HasColumnName("slash_sdt");
             entity.Property(e => e.SlowResRank)
@@ -4761,7 +4899,7 @@ public partial class XidbContext : DbContext
                 .HasColumnType("float(3,1)")
                 .HasColumnName("mob_skill_distance");
             entity.Property(e => e.MobSkillFlag)
-                .HasColumnType("tinyint(1) unsigned")
+                .HasColumnType("smallint(4) unsigned")
                 .HasColumnName("mob_skill_flag");
             entity.Property(e => e.MobSkillName)
                 .HasMaxLength(40)
@@ -4818,6 +4956,12 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Groupid)
                 .HasColumnType("int(10) unsigned")
                 .HasColumnName("groupid");
+            entity.Property(e => e.MaxLevel)
+                .HasColumnType("tinyint(2) unsigned")
+                .HasColumnName("maxLevel");
+            entity.Property(e => e.MinLevel)
+                .HasColumnType("tinyint(2) unsigned")
+                .HasColumnName("minLevel");
             entity.Property(e => e.Mobname)
                 .HasMaxLength(24)
                 .HasColumnName("mobname");
@@ -4836,10 +4980,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.PosZ)
                 .HasColumnType("float(7,3)")
                 .HasColumnName("pos_z");
-            entity.Property(e => e.Spawnset)
-                .HasDefaultValueSql("'0'")
+            entity.Property(e => e.Spawnslotid)
                 .HasColumnType("tinyint(3)")
-                .HasColumnName("spawnset");
+                .HasColumnName("spawnslotid");
         });
 
         modelBuilder.Entity<MobSpawnSet>(entity =>
@@ -4859,6 +5002,26 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Maxspawns)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("maxspawns");
+        });
+
+        modelBuilder.Entity<MobSpawnSlot>(entity =>
+        {
+            entity.HasKey(e => new { e.Zoneid, e.Spawnslotid })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+            entity.ToTable("mob_spawn_slots");
+
+            entity.Property(e => e.Zoneid)
+                .HasColumnType("smallint(3)")
+                .HasColumnName("zoneid");
+            entity.Property(e => e.Spawnslotid)
+                .HasColumnType("tinyint(3)")
+                .HasColumnName("spawnslotid");
+            entity.Property(e => e.Chance)
+                .HasDefaultValueSql("'0'")
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("chance");
         });
 
         modelBuilder.Entity<MobSpellList>(entity =>
@@ -5140,6 +5303,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.PetSkillParam)
                 .HasColumnType("smallint(5)")
                 .HasColumnName("pet_skill_param");
+            entity.Property(e => e.PetSkillRadius)
+                .HasColumnType("tinyint(2) unsigned")
+                .HasColumnName("pet_skill_radius");
             entity.Property(e => e.PetValidTargets)
                 .HasDefaultValueSql("'4'")
                 .HasColumnType("smallint(4) unsigned")
@@ -5393,6 +5559,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(24)
                 .HasColumnName("name");
+            entity.Property(e => e.Radius)
+                .HasColumnType("smallint(3) unsigned")
+                .HasColumnName("radius");
             entity.Property(e => e.RecastTime)
                 .HasColumnType("int(10) unsigned")
                 .HasColumnName("recastTime");
@@ -5458,6 +5627,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.Type)
                 .HasColumnType("smallint(5) unsigned")
                 .HasColumnName("type");
+            entity.Property(e => e.WearOffMessageId)
+                .HasColumnType("smallint(5) unsigned")
+                .HasColumnName("wear_off_message_id");
         });
 
         modelBuilder.Entity<SynergyRecipe>(entity =>
@@ -5800,6 +5972,9 @@ public partial class XidbContext : DbContext
             entity.Property(e => e.PrimarySc)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("primary_sc");
+            entity.Property(e => e.Radius)
+                .HasColumnType("tinyint(2) unsigned")
+                .HasColumnName("radius");
             entity.Property(e => e.Range)
                 .HasDefaultValueSql("'5'")
                 .HasColumnType("tinyint(2) unsigned")
@@ -5885,32 +6060,47 @@ public partial class XidbContext : DbContext
 
         modelBuilder.Entity<Zoneline>(entity =>
         {
-            entity.HasKey(e => e.Zoneline1).HasName("PRIMARY");
+            entity.HasKey(e => e.Zonelineid).HasName("PRIMARY");
 
             entity.ToTable("zonelines");
 
-            entity.Property(e => e.Zoneline1)
+            entity.Property(e => e.Zonelineid)
                 .ValueGeneratedNever()
                 .HasColumnType("int(10) unsigned")
-                .HasColumnName("zoneline");
-            entity.Property(e => e.Fromzone)
+                .HasColumnName("zonelineid");
+            entity.Property(e => e.FromPosX)
+                .HasColumnType("float(7,3)")
+                .HasColumnName("from_pos_x");
+            entity.Property(e => e.FromPosY)
+                .HasColumnType("float(7,3)")
+                .HasColumnName("from_pos_y");
+            entity.Property(e => e.FromPosZ)
+                .HasColumnType("float(7,3)")
+                .HasColumnName("from_pos_z");
+            entity.Property(e => e.FromZone)
                 .HasColumnType("smallint(3) unsigned")
-                .HasColumnName("fromzone");
-            entity.Property(e => e.Rotation)
-                .HasColumnType("tinyint(3) unsigned")
-                .HasColumnName("rotation");
-            entity.Property(e => e.Tox)
+                .HasColumnName("from_zone");
+            entity.Property(e => e.ToPosX)
                 .HasColumnType("float(7,3)")
-                .HasColumnName("tox");
-            entity.Property(e => e.Toy)
+                .HasColumnName("to_pos_x");
+            entity.Property(e => e.ToPosY)
                 .HasColumnType("float(7,3)")
-                .HasColumnName("toy");
-            entity.Property(e => e.Toz)
+                .HasColumnName("to_pos_y");
+            entity.Property(e => e.ToPosZ)
                 .HasColumnType("float(7,3)")
-                .HasColumnName("toz");
-            entity.Property(e => e.Tozone)
+                .HasColumnName("to_pos_z");
+            entity.Property(e => e.ToRotation)
+                .HasColumnType("float(7,6)")
+                .HasColumnName("to_rotation");
+            entity.Property(e => e.ToScaleX)
+                .HasColumnType("float(7,3)")
+                .HasColumnName("to_scale_x");
+            entity.Property(e => e.ToScaleZ)
+                .HasColumnType("float(7,3)")
+                .HasColumnName("to_scale_z");
+            entity.Property(e => e.ToZone)
                 .HasColumnType("smallint(3) unsigned")
-                .HasColumnName("tozone");
+                .HasColumnName("to_zone");
         });
 
         OnModelCreatingPartial(modelBuilder);

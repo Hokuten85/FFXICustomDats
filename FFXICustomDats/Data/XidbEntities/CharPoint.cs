@@ -402,4 +402,6 @@ public partial class CharPoint
     public uint TemenosUnits { get; set; }
 
     public uint ApollyonUnits { get; set; }
+
+    public ushort AlterEgoPoints { get; set; }
 }

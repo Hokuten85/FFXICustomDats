@@ -26,4 +26,6 @@ public partial class StatusEffect
     public ushort MinDuration { get; set; }
 
     public ushort SortKey { get; set; }
+
+    public ushort? WearOffMessageId { get; set; }
 }

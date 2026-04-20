@@ -11,7 +11,7 @@ public partial class ItemUsable
 
     public ushort ValidTargets { get; set; }
 
-    public byte Activation { get; set; }
+    public float Activation { get; set; }
 
     public ushort Animation { get; set; }
 

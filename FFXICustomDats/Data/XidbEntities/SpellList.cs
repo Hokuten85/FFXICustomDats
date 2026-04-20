@@ -51,5 +51,7 @@ public partial class SpellList
 
     public ushort SpellRange { get; set; }
 
+    public ushort Radius { get; set; }
+
     public string? ContentTag { get; set; }
 }

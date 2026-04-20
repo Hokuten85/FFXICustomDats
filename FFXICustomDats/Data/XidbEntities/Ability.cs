@@ -35,6 +35,8 @@ public partial class Ability
 
     public byte IsAoe { get; set; }
 
+    public byte Radius { get; set; }
+
     public short Ce { get; set; }
 
     public short Ve { get; set; }

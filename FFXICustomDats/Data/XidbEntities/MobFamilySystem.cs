@@ -17,8 +17,6 @@ public partial class MobFamilySystem
 
     public string? Ecosystem { get; set; }
 
-    public float Mobradius { get; set; }
-
     public byte Speed { get; set; }
 
     public byte Hp { get; set; }

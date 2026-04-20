@@ -72,7 +72,7 @@
             return reverseMap;
         }
 
-        public static bool IsEqual(List<Flag> flagList, ushort dbFlags)
+        public static bool IsEqual(List<Flag> flagList, uint dbFlags)
         {
             var dbList = Helpers.DBValueToYamlList(Map, dbFlags);
 

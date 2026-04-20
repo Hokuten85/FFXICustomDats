@@ -15,6 +15,8 @@ public partial class PetSkill
 
     public byte PetSkillAoe { get; set; }
 
+    public byte PetSkillRadius { get; set; }
+
     public float PetSkillDistance { get; set; }
 
     public ushort PetAnimTime { get; set; }
