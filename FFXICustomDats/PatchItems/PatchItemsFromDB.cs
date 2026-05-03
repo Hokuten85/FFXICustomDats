@@ -4,6 +4,7 @@ using FFXICustomDats.YamlModels.Items.ItemAttributes;
 using FFXICustomDats.YamlModels.Items.ItemTypes;
 using FFXICustomDats.YamlModels.SharedAttributes;
 using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
 
 namespace FFXICustomDats
 {
@@ -39,7 +40,10 @@ namespace FFXICustomDats
                                 join u in _context.ItemUsables
                                     on equipment.ItemId equals u.ItemId into ug
                                 from usable in ug.DefaultIfEmpty()
-                                select new { equipment, race, usable }).ToList(); ;
+                                join m in _context.ItemMods.Where(x => x.ModId == 1) //DEF Mod
+                                    on equipment.ItemId equals m.ItemId into mg
+                                from def in mg.DefaultIfEmpty()
+                                select new { equipment, race, usable, def }).ToList(); ;
 
             foreach (var item in items)
             {
@@ -47,7 +51,8 @@ namespace FFXICustomDats
                 if (dbItem != null)
                 {
                     UpdateItemEquipment(item, dbItem.equipment);
-                    UpdateItemMod(item, dbItem.race);
+                    UpdateItemRace(item, dbItem.race);
+                    UpdateItemDefense(item, dbItem.def);
                     UpdateItemUsable(item, dbItem.usable);
                 }
             }
@@ -135,6 +140,16 @@ namespace FFXICustomDats
                 if (item.Weapon.Damage != dbDamage)
                 {
                     item.Weapon.Damage = dbDamage;
+
+                    item.Strings.Description = Regex.Replace(item.Strings.Description, "DMG:[0-9]+", $"DMG:{dbDamage}");
+                }
+
+                if (Regex.IsMatch(item.Strings.Description, "DMG:[0-9]+"))
+                {
+                    if (int.TryParse(Regex.Match(item.Strings.Description, "DMG:([0-9]+)").Result("$1"), out int datDamage) && datDamage != dbDamage)
+                    {
+                        item.Strings.Description = Regex.Replace(item.Strings.Description, "DMG:[0-9]+", $"DMG:{dbDamage}");
+                    }
                 }
 
                 var dbDelay = weapon.Delay;
@@ -146,6 +161,14 @@ namespace FFXICustomDats
                 if (dbDelay > 0 && item.Weapon.Delay != dbDelay)
                 {
                     item.Weapon.Delay = dbDelay;
+                }
+
+                if (Regex.IsMatch(item.Strings.Description, "Delay:[0-9]+"))
+                {
+                    if (int.TryParse(Regex.Match(item.Strings.Description, "Delay:([0-9]+)").Result("$1"), out int datDelay) && datDelay != dbDelay)
+                    {
+                        item.Strings.Description = Regex.Replace(item.Strings.Description, "Delay:[0-9]+", $"Delay:{dbDelay}");
+                    }
                 }
 
                 if (dbDelay > 0 && (item.Weapon.Damage != dbDamage || item.Weapon.Delay != dbDelay)
@@ -229,12 +252,26 @@ namespace FFXICustomDats
             }
         }
 
-        public void UpdateItemMod(ArmorItem item, ItemMod race)
+        public void UpdateItemRace(ArmorItem item, ItemMod race)
         {
             if (race != null && _config.GetValue<bool>("TrustDatabaseRace")
                 && Helpers.ConvertEnumListToBit(item.Equipment.Races) != race.Value)
             {
                 item.Equipment.Races = Helpers.BitsToEnumList<Race>((ushort)race.Value);
+            }
+        }
+
+        public void UpdateItemDefense(ArmorItem item, ItemMod defense)
+        {
+            if (defense != null && _config.GetValue<bool>("TrustDatabaseDefense"))
+            {
+                if (Regex.IsMatch(item.Strings.Description, "DEF:[0-9]+"))
+                {
+                    if(int.TryParse(Regex.Match(item.Strings.Description, "DEF:([0-9]+)").Result("$1"), out int datDefense) && datDefense != defense.Value)
+                    {
+                        item.Strings.Description = Regex.Replace(item.Strings.Description, "DEF:[0-9]+", $"DEF:{defense.Value}");
+                    }
+                }
             }
         }
 
